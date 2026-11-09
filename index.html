@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-title" content="TV Note">
 <meta name="theme-color" content="#050507">
 <title>TV Note</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #050507; --text: #f5f5f7; --muted: rgba(235,235,245,.55);
@@ -246,79 +249,195 @@ body.remote #remote { display: flex; }
 .fonts { display: flex; gap: 8px; }
 .fonts button { flex: 1; height: 44px; border: 0; border-radius: 12px; background: var(--glass); box-shadow: inset 0 0 0 .5px var(--edge); font-size: 17px; }
 .fonts button.on { background: rgba(255,255,255,.18); box-shadow: inset 0 0 0 1.5px var(--text); }
+
+/* ================= Sketchbook theme (Note mode) ================= */
+body:not(.remote) { font-family: "Patrick Hand", -apple-system, sans-serif; background: #17112a; }
+body:not(.remote) .aura { opacity: .35; }
+.desk { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(60% 45% at 12% 0%, rgba(255,190,110,.22), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' fill='none' stroke='%23ffffff' stroke-opacity='.055' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M20 40c10-14 22 14 32 0s22 14 32 0'/%3E%3Cpath d='m160 30 4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z'/%3E%3Cpath d='M40 150c0-8 12-8 12 0 0-8 12-8 12 0 0 9-12 15-12 15s-12-6-12-15z'/%3E%3Ccircle cx='170' cy='150' r='14'/%3E%3Cpath d='M170 150m-6 0a6 6 0 1 0 12 0'/%3E%3Cpath d='M110 95l8 8m0-8-8 8'/%3E%3Cpath d='M120 190q15-20 30 0t30 0'/%3E%3C/svg%3E") 0 0 / 220px 220px,
+    linear-gradient(170deg, #2a1d47, #140f24 70%); }
+body.remote .desk { display: none; }
+
+/* header */
+body:not(.remote) #mode { background: rgba(255,255,255,.08); }
+body:not(.remote) #mode button { font-family: "Patrick Hand", sans-serif; font-size: 17px; }
+body:not(.remote) #status { font-family: "Caveat", cursive; font-size: 19px; font-weight: 700; color: rgba(255,240,220,.7); }
+#send { height: 44px; padding: 0 20px 0 14px; border-radius: 14px; font-family: "Caveat", cursive; font-size: 24px; font-weight: 700; letter-spacing: .01em;
+  background: #ff6b6b; color: #fff; transform: rotate(-2deg);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.35), inset 0 -3px 0 rgba(0,0,0,.18), 0 6px 0 #c94848, 0 14px 26px -8px rgba(255,90,90,.7); }
+#send .plane { font-size: 20px; display: inline-block; transition: transform 500ms var(--ease); }
+#send:active { transform: rotate(-2deg) translateY(4px); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35), 0 2px 0 #c94848; }
+#send.fly .plane { transform: translate(40px, -30px) rotate(-20deg); opacity: 0; transition: transform 600ms var(--ease), opacity 600ms; }
+
+/* the sketchbook */
+#wrap { padding-top: 14px; }
+.book { position: relative; height: 100%; aspect-ratio: 4 / 5; max-width: 100%; max-height: 100%; }
+#pad { position: absolute; inset: 0; height: auto; aspect-ratio: auto; border-radius: 10px 10px 16px 16px;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,.09) 1px, transparent 1.4px) 0 0 / 22px 22px,
+    linear-gradient(160deg, #2c2c35, #1b1b22);
+  box-shadow: 0 1px 0 rgba(255,255,255,.15) inset, 5px 7px 0 -1px #e9dfc8, 10px 13px 0 -3px #d9cdb2, 0 30px 60px -18px rgba(0,0,0,.85); }
+.rings { position: absolute; top: -13px; left: 18px; right: 18px; height: 26px; z-index: 3; pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 70%, #17112a 0 3.5px, transparent 4px) 0 0 / 24px 26px repeat-x,
+    radial-gradient(ellipse 5px 12px at 50% 50%, transparent 0 2.6px, #d8d8e2 3px, #8e8ea0 4.6px, transparent 5px) 0 0 / 24px 26px repeat-x;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.5)); }
+.tape { position: absolute; z-index: 3; pointer-events: none; width: 92px; height: 26px; opacity: .85;
+  background: repeating-linear-gradient(45deg, rgba(255,255,255,.25) 0 6px, transparent 6px 12px), var(--c);
+  -webkit-mask: linear-gradient(90deg, transparent 0 3px, #000 3px calc(100% - 3px), transparent 0); mask: linear-gradient(90deg, transparent 0 3px, #000 3px calc(100% - 3px), transparent 0);
+  box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.tape.t1 { --c: #ff9ec4; bottom: 14px; right: -22px; transform: rotate(-38deg); }
+.tape.t2 { --c: #8be0c0; bottom: -6px; left: -16px; transform: rotate(28deg); width: 70px; }
+#empty { color: rgba(80,62,40,.55); font-family: "Patrick Hand", sans-serif; font-size: 17px; }
+#empty b { font-family: "Caveat", cursive; font-size: 40px; color: rgba(70,52,30,.75); font-weight: 700; }
+body.clearpad #empty, body.clearpad #empty b { color: rgba(255,255,255,.55); }
+
+/* dock = kraft-paper pencil case */
+body:not(.remote) .dock { padding: 0; gap: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.tabsrow { display: flex; align-items: flex-end; justify-content: space-between; padding: 0 6px; gap: 6px; }
+#tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+#tabs::-webkit-scrollbar { display: none; }
+#tabs button { flex: none; border: 0; height: 36px; padding: 0 12px; border-radius: 12px 12px 0 0; font-family: "Patrick Hand", sans-serif; font-size: 16px; color: #3b2a18;
+  background: color-mix(in srgb, var(--tab) 70%, #000 30%); opacity: .8; transform: translateY(6px); transition: transform 220ms var(--spring), opacity 200ms; }
+#tabs button.on { background: var(--tab); opacity: 1; transform: translateY(0); box-shadow: 0 -4px 12px -6px rgba(0,0,0,.6); }
+.tabsrow .icons { padding-bottom: 6px; }
+.tabsrow .ib { background: #fff7e6; color: #3b2a18; box-shadow: 0 3px 0 #c9b48f; }
+.tabsrow .ib.warn { background: #ff6b6b; color: #fff; box-shadow: 0 3px 0 #c94848; }
+.tray { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 14px 12px 12px; border-radius: 4px 20px 22px 22px; color: #3b2a18;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .2 0 0 0 0 .1 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(170deg, #d9b583, #c39a63);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 18px 40px -18px rgba(0,0,0,.9); }
+.tray::before { content: ""; position: absolute; inset: 6px; border: 2px dashed rgba(255,255,255,.45); border-radius: 2px 16px 18px 18px; pointer-events: none; }
+
+/* brushes as little cards */
+.tools { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 6px 2px 2px; }
+.tools::-webkit-scrollbar { display: none; }
+.tools button { flex: none; width: 66px; height: 62px; border: 0; border-radius: 12px; background: #fffaf0; color: #5a4128;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-family: "Patrick Hand", sans-serif; font-size: 14px;
+  box-shadow: 0 3px 0 #d8c7a6; transition: transform 220ms var(--spring), box-shadow 200ms; }
+.tools button em { font-style: normal; font-size: 24px; line-height: 1; }
+.tools button:nth-child(odd) { transform: rotate(-1.5deg); } .tools button:nth-child(even) { transform: rotate(1.5deg); }
+.tools button.on { transform: translateY(-5px) rotate(0) scale(1.05); background: #fff; box-shadow: 0 0 0 3px #3b2a18, 0 8px 0 #c9b48f; }
+
+/* crayons */
+#paint { gap: 6px; }
+#sizes { border-right: 2px dashed rgba(59,42,24,.35); padding-right: 6px; }
+#sizes button i { background: rgba(59,42,24,.45); }
+#sizes button.on i { background: #3b2a18; box-shadow: 0 0 0 3px rgba(255,255,255,.6); }
+#colors { gap: 6px; padding: 10px 2px 2px; align-items: flex-end; }
+#colors .dot { width: 24px; height: 46px; border-radius: 3px 3px 5px 5px; box-shadow: inset -5px 0 0 rgba(0,0,0,.12), inset 0 -10px 0 rgba(0,0,0,.08), 0 2px 0 rgba(0,0,0,.18);
+  clip-path: polygon(32% 0, 68% 0, 100% 26%, 100% 100%, 0 100%, 0 26%); transition: transform 240ms var(--spring); }
+#colors .dot::after { content: ""; position: absolute; inset: auto 0 10px 0; height: 9px; opacity: 1; transform: none; border-radius: 0;
+  box-shadow: none; background: rgba(255,255,255,.28); }
+#colors .dot.on { transform: translateY(-9px); }
+#colors .dot.on::after { background: rgba(255,255,255,.75); }
+#colors .dot.custom { background: linear-gradient(180deg, #ff5f6d, #ffc371, #a6e22e, #64d2ff, #bf5af2); }
+
+/* shapes, pills, stickers, paper */
+.shapes button { background: #fffaf0; color: #3b2a18; box-shadow: 0 3px 0 #d8c7a6; border-radius: 12px; }
+.shapes button.on { background: #fff; color: #3b2a18; box-shadow: 0 0 0 3px #3b2a18, 0 5px 0 #c9b48f; }
+.pills { display: flex; gap: 8px; }
+.pills button { height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(255,250,240,.6); color: #3b2a18; font-family: "Patrick Hand", sans-serif; font-size: 16px; }
+.pills button.on { background: #3b2a18; color: #fffaf0; }
+.textbtn { background: #fffaf0 !important; color: #3b2a18; font-family: "Caveat", cursive !important; font-size: 22px !important; font-weight: 700 !important; box-shadow: 0 3px 0 #d8c7a6 !important; }
+.stk { background: #fff; border-radius: 14px; padding: 8px; max-height: 118px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), 0 3px 0 #d8c7a6;
+  background-image: linear-gradient(135deg, rgba(0,0,0,.03) 25%, transparent 25%, transparent 50%, rgba(0,0,0,.03) 50%, rgba(0,0,0,.03) 75%, transparent 75%); background-size: 14px 14px; }
+.stk button { font-size: 27px; filter: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+.stk button:nth-child(3n) { transform: rotate(-8deg); } .stk button:nth-child(3n+1) { transform: rotate(6deg); }
+.stk button:active { transform: scale(.8) rotate(12deg); }
+.tray .hint { color: rgba(59,42,24,.7); font-family: "Patrick Hand", sans-serif; font-size: 15px; }
+.des span { color: #5a4128; font-family: "Patrick Hand", sans-serif; font-size: 14px; }
+.des.on span { color: #3b2a18; }
+.des i { position: relative; border-radius: 6px; box-shadow: 0 3px 8px rgba(0,0,0,.25); }
+.des i::before { content: ""; position: absolute; top: -6px; left: 50%; width: 30px; height: 12px; margin-left: -15px; transform: rotate(-4deg); background: rgba(255,255,255,.55); }
+.des.on i { box-shadow: 0 0 0 3px #3b2a18, 0 6px 10px rgba(0,0,0,.25); }
+#del { font-family: "Patrick Hand", sans-serif; font-size: 16px; }
+
+/* confetti when it lands on the TV */
+.confetti { position: fixed; z-index: 9; pointer-events: none; font-size: 22px; will-change: transform, opacity; animation: pop 1100ms cubic-bezier(.2,.7,.3,1) forwards; }
+@keyframes pop { to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; } }
 </style>
 </head>
 <body>
 <div class="aura"></div>
+<div class="desk"></div>
 <header>
   <div class="seg" id="mode"><button data-m="note" class="on">Note</button><button data-m="remote">Remote</button></div>
   <div class="hright">
     <div id="status"><i></i><span>Draw, then send</span></div>
-    <button id="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Send</button>
+    <button id="send"><span class="plane">✈︎</span>Send</button>
   </div>
 </header>
 
-<div id="wrap"><div id="pad"><canvas id="c"></canvas>
-  <div id="empty"><div><b>Draw something</b>Add shapes, stickers and designs below.<br>Tap Send to put it on your TV.</div></div>
-  <div id="flash"></div>
-  <button id="del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button>
+<div id="wrap"><div class="book">
+  <div class="rings"></div>
+  <div id="pad"><canvas id="c"></canvas>
+    <div id="empty"><div><b>doodle something ✎</b>pick a crayon below · tap Send to put it on the TV</div></div>
+    <div id="flash"></div>
+    <button id="del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button>
+  </div>
+  <div class="tape t1"></div><div class="tape t2"></div>
 </div></div>
 
 <div class="dock">
-  <div class="line">
-    <div class="seg" id="tabs">
-      <button data-t="draw" class="on">Draw</button>
-      <button data-t="shapes">Shapes</button>
-      <button data-t="stickers">Stickers</button>
-      <button data-t="designs">Designs</button>
+  <div class="tabsrow">
+    <div id="tabs">
+      <button data-t="draw" class="on" style="--tab:#ffd166">✏️ Draw</button>
+      <button data-t="shapes" style="--tab:#8be0c0">⭐ Shapes</button>
+      <button data-t="stickers" style="--tab:#ff9ec4">🌈 Stickers</button>
+      <button data-t="designs" style="--tab:#9cc7ff">📄 Paper</button>
     </div>
     <div class="icons">
-      <button class="ib" id="undo" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
-      <button class="ib" id="clear" aria-label="Clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+      <button class="ib" id="undo" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="ib" id="clear" aria-label="Clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
     </div>
   </div>
-
-  <div class="panel on" id="p-draw">
-    <div class="seg" id="brushes">
-      <button data-b="pen" class="on">Pen</button>
-      <button data-b="marker">Marker</button>
-      <button data-b="highlighter">Highlighter</button>
-      <button data-b="glow">Glow</button>
-      <button data-b="rainbow">Rainbow</button>
-      <button data-b="calligraphy">Calligraphy</button>
-      <button data-b="chalk">Chalk</button>
-      <button data-b="dotted">Dotted</button>
-      <button data-b="spray">Spray</button>
-      <button data-b="eraser">Eraser</button>
+  <div class="tray">
+    <div class="panel on" id="p-draw">
+      <div class="tools" id="brushes">
+        <button data-b="pen" class="on"><em>✏️</em>Pencil</button>
+        <button data-b="marker"><em>🖍️</em>Marker</button>
+        <button data-b="highlighter"><em>🖌️</em>Highlight</button>
+        <button data-b="glow"><em>✨</em>Neon</button>
+        <button data-b="rainbow"><em>🌈</em>Rainbow</button>
+        <button data-b="calligraphy"><em>🪶</em>Ink nib</button>
+        <button data-b="chalk"><em>☁️</em>Chalk</button>
+        <button data-b="dotted"><em>➰</em>Dotted</button>
+        <button data-b="spray"><em>💨</em>Spray</button>
+        <button data-b="eraser"><em>🧽</em>Eraser</button>
+      </div>
     </div>
-  </div>
 
-  <div class="panel" id="p-shapes">
-    <div class="shapes" id="shapes">
-      <button data-s="line" class="on" aria-label="Line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 19 19 5"/></svg></button>
-      <button data-s="arrow" aria-label="Arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5M10 5h9v9"/></svg></button>
-      <button data-s="rect" aria-label="Square"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="5" width="16" height="14" rx="3"/></svg></button>
-      <button data-s="circle" aria-label="Circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/></svg></button>
-      <button data-s="heart" aria-label="Heart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
-      <button data-s="star" aria-label="Star"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg></button>
+    <div class="panel" id="p-shapes">
+      <div class="shapes" id="shapes">
+        <button data-s="line" class="on" aria-label="Line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 19 19 5"/></svg></button>
+        <button data-s="arrow" aria-label="Arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5M10 5h9v9"/></svg></button>
+        <button data-s="rect" aria-label="Square"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="5" width="16" height="14" rx="3"/></svg></button>
+        <button data-s="circle" aria-label="Circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="8"/></svg></button>
+        <button data-s="heart" aria-label="Heart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+        <button data-s="star" aria-label="Star"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg></button>
+      </div>
+      <div class="pills" id="fill">
+        <button data-f="outline" class="on">outline</button>
+        <button data-f="filled">filled in</button>
+      </div>
     </div>
-    <div class="seg" id="fill" style="align-self:flex-start">
-      <button data-f="outline" class="on">Outline</button>
-      <button data-f="filled">Filled</button>
+
+    <div class="panel" id="p-stickers">
+      <button class="textbtn" id="addText">Aa · write something</button>
+      <div class="stk" id="stickers"></div>
+      <div class="hint">drag to move · pinch to resize &amp; turn</div>
     </div>
-  </div>
 
-  <div class="panel" id="p-stickers">
-    <button class="textbtn" id="addText">Aa&nbsp;&nbsp;Add text</button>
-    <div class="stk" id="stickers"></div>
-    <div class="hint">Drag to move. Pinch with two fingers to resize and turn.</div>
-  </div>
+    <div class="panel" id="p-designs">
+      <div class="scroll" id="designs"></div>
+    </div>
 
-  <div class="panel" id="p-designs">
-    <div class="scroll" id="designs"></div>
+    <div id="paint"><div id="sizes"></div><div class="scroll" id="colors"></div></div>
   </div>
-
-  <div id="paint"><div id="sizes"></div><div class="scroll" id="colors"></div></div>
 </div>
 
 <div id="remote">
@@ -379,6 +498,7 @@ body.remote #remote { display: flex; }
     <button data-f="script" style="font-family:'Snell Roundhand','Segoe Script',cursive">Script</button>
     <button data-f="neon" style="font-weight:600;text-shadow:0 0 8px #ff6ad5">Neon</button>
     <button data-f="type" style="font-family:'American Typewriter','Courier New',monospace">Type</button>
+    <button data-f="hand" style="font-family:Caveat,cursive;font-weight:700;font-size:22px">Hand</button>
   </div>
   <div class="row"><button class="secondary" id="textCancel">Cancel</button><button class="primary" id="textAdd">Add</button></div>
 </div>
@@ -388,13 +508,14 @@ body.remote #remote { display: flex; }
 const RELAY = "https://ntfy.sh/";
 const OUT_W = 720, OUT_H = 900;  // image the TV receives (4:5)
 
-const COLORS = ["#ffffff", "#c7c7cc", "#1c1c1e", "#ff3b30", "#ff8a65", "#ff9500", "#ffd60a", "#fff3a0", "#a6e22e", "#34d399",
-  "#00c7be", "#64d2ff", "#0a84ff", "#5e5ce6", "#a78bfa", "#bf5af2", "#ff6ad5", "#ff2d55", "#f4c2c2", "#c69c6d", "#8b5a2b"];
+const COLORS = ["#2b2b2b", "#ffffff", "#8e8e98", "#ff3b30", "#ff6b6b", "#ff9500", "#ffd60a", "#fff3a0", "#a6e22e", "#34d399",
+  "#00c7be", "#64d2ff", "#0a84ff", "#5e5ce6", "#a78bfa", "#bf5af2", "#ff6ad5", "#ff2d55", "#f4c2c2", "#c69c6d", "#8b5a2b", "#3e2723"];
 const STICKERS = ["❤️","💖","💕","✨","⭐","🌟","🔥","💯","😂","😍","🥰","😘","😎","🥳","😴","🤗","👋","👍","🙌","👏","🎉","🎊","🎁","🎂",
   "🍿","🎬","📺","🎮","🎵","🎧","🍕","🍔","🌮","🍣","☕","🍷","🍪","🍩","🌙","☀️","🌈","⛅","❄️","🌸","🌻","🍀","🌊","🏖️",
   "🐶","🐱","🐻","🦊","🐼","🦄","🦋","🐝","🏠","🚗","✈️","⚽","🏀","💤","💡","📌"];
 const DESIGNS = [
-  { id: "none",     name: "Glass",    css: "linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04))" },
+  { id: "sketch",   name: "Sketch",   css: "radial-gradient(circle at 2px 2px,rgba(80,60,40,.25) 1px,transparent 1.5px) 0 0/8px 8px,#fbf6ea", solid: "#fbf6ea", sketch: true },
+  { id: "none",     name: "Clear",    css: "linear-gradient(160deg,#3a3a46,#1b1b22)" },
   { id: "midnight", name: "Midnight", css: "linear-gradient(160deg,#1b2a6b,#070b1f)", stops: [["#1b2a6b", 0], ["#070b1f", 1]] },
   { id: "sunset",   name: "Sunset",   css: "linear-gradient(170deg,#ff9a5a,#ff4f81 55%,#6a2ca8)", stops: [["#ff9a5a", 0], ["#ff4f81", .55], ["#6a2ca8", 1]] },
   { id: "aurora",   name: "Aurora",   css: "linear-gradient(160deg,#0b3d3a,#1fa37a 45%,#3b1f6b)", stops: [["#0b3d3a", 0], ["#1fa37a", .45], ["#3b1f6b", 1]] },
@@ -412,7 +533,8 @@ const FONTS = {
   bold:   { css: '800 1em -apple-system, "SF Pro Display", Inter, sans-serif' },
   script: { css: '400 1em "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive' },
   neon:   { css: '600 1em -apple-system, "SF Pro Rounded", Inter, sans-serif', glow: true },
-  type:   { css: '400 1em "American Typewriter", "Courier New", monospace' }
+  type:   { css: '400 1em "American Typewriter", "Courier New", monospace' },
+  hand:   { css: '700 1.25em Caveat, "Patrick Hand", cursive' }
 };
 
 // ---------- pairing code: from the link (#code) or typed once; kept on this phone only ----------
@@ -433,13 +555,14 @@ $("save").onclick = () => {
 // ---------- state ----------
 // Layers, bottom to top: design, ink (strokes + shapes; the eraser only removes ink), stickers + text.
 // Positions are 0..1 of the pad, so the TV copy is drawn sharp at its own size.
-let items = [], bg = "none", selected = null;
+let items = [], bg = "sketch", selected = null;
 let color = COLORS[0], brush = "pen", sizeMul = 1, tab = "draw", font = "bold", shape = "line", fillMode = "outline";
 const undoStack = [];
 const snap = () => JSON.stringify({ items, bg });
 function remember() { undoStack.push(snap()); if (undoStack.length > 60) undoStack.shift(); }
 function restore(s) { const o = JSON.parse(s); items = o.items; bg = o.bg; selected = null; }
 const isInk = o => o.t === "s" || o.t === "h";
+const hasContent = () => items.length > 0 || (bg !== "none" && bg !== "sketch");
 
 // ---------- UI ----------
 function choose(group, el) { group.querySelectorAll("button").forEach(b => b.classList.toggle("on", b === el)); }
@@ -504,6 +627,10 @@ function paintDesign(g, w, h) {
   if (d.solid) { g.fillStyle = d.solid; g.fillRect(0, 0, w, h); }
   else { const gr = g.createLinearGradient(0, 0, w * .35, h); d.stops.forEach(([c, o]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h); }
   const R = rand(7);
+  if (d.sketch) { // sketchbook paper: faint grain and a soft dot grid
+    for (let i = 0; i < 700; i++) { g.fillStyle = "rgba(90,70,40," + (R() * .07) + ")"; g.fillRect(R() * w, R() * h, w * .003, w * .003); }
+    g.fillStyle = "rgba(90,70,40,.13)"; const st = w / 24; for (let y = st; y < h; y += st) for (let x = st; x < w; x += st) { g.beginPath(); g.arc(x, y, w * .0018, 0, 7); g.fill(); }
+  }
   if (d.lines) { g.strokeStyle = d.lines; g.lineWidth = Math.max(1, w * .002); for (let y = h * .12; y < h; y += h * .07) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); } }
   if (d.noise) { for (let i = 0; i < 900; i++) { g.fillStyle = "rgba(255,255,255," + (R() * .06) + ")"; g.fillRect(R() * w, R() * h, w * .004, w * .004); } }
   if (d.stars) { for (let i = 0; i < 140; i++) { const r = w * (.001 + R() * .004); g.fillStyle = "rgba(255,255,255," + (.3 + R() * .7) + ")"; g.beginPath(); g.arc(R() * w, R() * h, r, 0, 7); g.fill(); } }
@@ -669,7 +796,8 @@ function draw() {
     ctx.setLineDash([w * .015, w * .012]); ctx.lineWidth = Math.max(1.5, w * .004); ctx.strokeStyle = "rgba(255,255,255,.85)";
     ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 4; ctx.strokeRect(-hw, -hh, hw * 2, hh * 2); ctx.restore();
   }
-  emptyEl.style.opacity = items.length || bg !== "none" ? 0 : 1;
+  emptyEl.style.opacity = items.length ? 0 : 1;
+  document.body.classList.toggle("clearpad", bg === "none");
   delBtn.classList.toggle("show", !!selected);
 }
 function redraw() { if (!frame) frame = requestAnimationFrame(draw); }
@@ -756,16 +884,16 @@ $("undo").onclick = () => { if (!undoStack.length) return; restore(undoStack.pop
 const clearBtn = $("clear");
 let clearArmed = 0;
 clearBtn.onclick = () => {   // tap twice to clear the pad (the TV only changes when you tap Send)
-  if (!items.length && bg === "none") return;
+  if (!hasContent()) return;
   if (!clearArmed) { clearBtn.classList.add("warn"); clearArmed = setTimeout(() => { clearBtn.classList.remove("warn"); clearArmed = 0; }, 1800); return; }
   clearTimeout(clearArmed); clearArmed = 0; clearBtn.classList.remove("warn");
-  remember(); items = []; selected = null; bg = "none"; syncDesignButtons(); designDirty = true; changed();
+  remember(); items = []; selected = null; bg = "sketch"; syncDesignButtons(); designDirty = true; changed();
 };
 
 // ---------- draft: kept on this phone so nothing is lost before you send ----------
 let draftTimer = 0;
 function markDirty() {
-  setStatus(items.length || bg !== "none" ? "Not sent yet" : "Empty", "dirty");
+  setStatus(hasContent() ? "Not sent yet" : "Empty", "dirty");
   clearTimeout(draftTimer); draftTimer = setTimeout(() => save("draft", snap()), 400);
 }
 try { const d = load("draft"); if (d) { restore(d); syncDesignButtons(); } } catch (e) {}
@@ -773,20 +901,32 @@ try { const d = load("draft"); if (d) { restore(d); syncDesignButtons(); } } cat
 // ---------- Send: only when you tap it ----------
 const statusEl = $("status"), statusText = statusEl.querySelector("span"), flash = $("flash"), sendBtn = $("send");
 function setStatus(t, cls) { statusText.textContent = t; statusEl.className = cls || ""; }
-function sent() { flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go"); if (navigator.vibrate) navigator.vibrate(10); }
+function sent() {
+  flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go"); if (navigator.vibrate) navigator.vibrate(10);
+  sendBtn.classList.add("fly"); setTimeout(() => sendBtn.classList.remove("fly"), 900);
+  const r = sendBtn.getBoundingClientRect(), bits = ["✨", "⭐", "💖", "🎉", "✏️", "🌈", "💫"];
+  for (let i = 0; i < 16; i++) {
+    const c = document.createElement("i"); c.className = "confetti"; c.textContent = bits[i % bits.length];
+    c.style.left = (r.left + r.width / 2) + "px"; c.style.top = (r.top + r.height / 2) + "px";
+    const a = Math.random() * Math.PI - Math.PI, d = 80 + Math.random() * 160;
+    c.style.setProperty("--dx", Math.cos(a) * d + "px"); c.style.setProperty("--dy", (Math.sin(a) * d + 120) + "px"); c.style.setProperty("--rot", (Math.random() * 360 - 180) + "deg");
+    document.body.appendChild(c); setTimeout(() => c.remove(), 1200);
+  }
+}
 sendBtn.onclick = async () => {
   if (!okCode(code)) return pairEl.classList.add("show");
   sendBtn.disabled = true; setStatus("Sending", "busy");
   try {
     let r;
-    if (!items.length && bg === "none") r = await fetch(RELAY + encodeURIComponent(code), { method: "POST", body: "clear" });
+    if (!hasContent()) r = await fetch(RELAY + encodeURIComponent(code), { method: "POST", body: "clear" });
     else {
+      try { await document.fonts.ready; } catch (e) {}
       const out = canvasOf(OUT_W, OUT_H); renderAll(out.getContext("2d"), OUT_W, OUT_H);
       const blob = await new Promise(ok => out.toBlob(ok, "image/png"));
       r = await fetch(RELAY + encodeURIComponent(code) + "?filename=note.png", { method: "PUT", body: blob });
     }
     if (!r.ok) throw new Error(r.status);
-    setStatus(items.length || bg !== "none" ? "On your TV" : "Removed from TV", "live"); sent();
+    setStatus(hasContent() ? "On your TV" : "Removed from TV", "live"); sent();
   } catch (e) { setStatus("Not sent. Try again.", "err"); }
   sendBtn.disabled = false;
 };
@@ -968,7 +1108,7 @@ textMic.onclick = () => {
 };
 
 size();
-if (items.length || bg !== "none") setStatus("Draft not sent yet", "dirty");
+if (hasContent()) setStatus("Draft not sent yet", "dirty");
 </script>
 </body>
 </html>
