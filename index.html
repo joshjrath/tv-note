@@ -376,11 +376,11 @@ body:not(.remote) .dock { padding: 0; gap: 0; background: none; box-shadow: none
 @keyframes pop { to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; } }
 </style>
 </head>
-<body>
+<body class="remote">
 <div class="aura"></div>
 <div class="desk"></div>
 <header>
-  <div class="seg" id="mode"><button data-m="note" class="on">Note</button><button data-m="remote">Remote</button></div>
+  <div class="seg" id="mode"><button data-m="note">Note</button><button data-m="remote" class="on">Remote</button></div>
   <button id="power" aria-label="TV power"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg></button>
   <div class="hright">
     <div id="status"><i></i><span>Draw, then send</span></div>
@@ -803,6 +803,7 @@ addEventListener("resize", size);
 function draw() {
   frame = 0;
   const w = cv.width, h = cv.height;
+  if (!w || !h) return; // pad is hidden (Remote is showing); it is drawn when you switch to Note
   if (designDirty) { const g = designC.getContext("2d"); g.clearRect(0, 0, w, h); paintDesign(g, w, h); designDirty = false; }
   if (inkDirty) { const g = inkC.getContext("2d"); g.clearRect(0, 0, w, h); for (const o of items) if (isInk(o) && o !== active) paintInk(g, o, w, h); inkDirty = false; }
   ctx.clearRect(0, 0, w, h);
