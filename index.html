@@ -229,13 +229,29 @@ body.remote #remote { display: flex; }
 #mic::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 1.5px solid rgba(200,170,255,.45); animation: halo 2.6s ease-out infinite; }
 @keyframes halo { from { transform: scale(.9); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
 
-/* volume rocker */
-.rocker { display: grid; grid-template-columns: 1fr 1fr 1fr; height: 54px; border-radius: 999px; overflow: hidden;
-  background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.22); }
-.rocker button { border: 0; background: transparent; color: #fff; display: grid; place-items: center; transition: background 160ms; }
-.rocker button + button { box-shadow: inset 1px 0 0 rgba(255,255,255,.1); }
-.rocker button svg { width: 24px; height: 24px; }
-.rocker button:active, .rocker button.hit { background: rgba(var(--tint), .35); }
+/* volume: drag anywhere on the bar, like Control Center */
+#vol { display: flex; gap: 10px; align-items: stretch; height: 64px; }
+#volMute { flex: none; width: 64px; border: 0; border-radius: 22px; display: grid; place-items: center; color: #fff;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.16), rgba(255,255,255,.05));
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.18), inset 0 1px 0 rgba(255,255,255,.28); transition: transform 180ms var(--spring), background 200ms; }
+#volMute svg { width: 28px; height: 28px; }
+#volMute:active { transform: scale(.9); }
+#volMute.on { background: #ff453a; }
+#volBar { position: relative; flex: 1; border-radius: 22px; overflow: hidden; touch-action: none; cursor: grab;
+  background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.22);
+  transition: transform 260ms var(--spring), box-shadow 200ms; }
+#volBar .fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--lv, 0) * 1%); border-radius: inherit;
+  background: linear-gradient(90deg, rgba(var(--tint), .55), rgba(var(--tint), .95));
+  box-shadow: 0 0 24px rgba(var(--tint), .55); transition: width 160ms var(--ease); }
+#volBar .fill::after { content: ""; position: absolute; right: 8px; top: 50%; width: 6px; height: 28px; margin-top: -14px; border-radius: 3px; background: rgba(255,255,255,.9); }
+#volBar.drag { transform: scaleY(1.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), 0 0 30px rgba(var(--tint), .45); }
+#volBar.drag .fill { transition: none; }
+#volBar .lbl { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 700; letter-spacing: .08em; color: rgba(255,255,255,.75); pointer-events: none; }
+#volBar .num { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 26px; font-weight: 800; letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums; pointer-events: none; transition: font-size 200ms var(--ease); }
+#volBar.drag .num { font-size: 32px; }
+#volBar.muted .fill { filter: grayscale(1); opacity: .35; }
+#volBar.unknown .fill { opacity: .25; }
 
 /* app shelf */
 .shelf { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 4px; margin: 0 -2px; scroll-snap-type: x proximity; }
@@ -247,7 +263,7 @@ body.remote #remote { display: flex; }
 .app:active i, .app.hit i { transform: scale(.88); }
 #rstatus { font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.4; min-height: 1.4em; transition: color 200ms; }
 #rstatus.err { color: #ff6961; }
-@media (max-height: 700px) { #touch .hint { display: none; } .rk { width: 52px; height: 52px; } #mic { width: 66px; height: 66px; } .rocker { height: 46px; } .app i { width: 50px; height: 50px; border-radius: 15px; } }
+@media (max-height: 700px) { #touch .hint { display: none; } .rk { width: 52px; height: 52px; } #mic { width: 66px; height: 66px; } #vol { height: 54px; } #volMute { width: 54px; } .app i { width: 50px; height: 50px; border-radius: 15px; } }
 
 /* sheets */
 .sheet { position: fixed; inset: 0; display: none; flex-direction: column; justify-content: center; gap: 14px; padding: 28px;
@@ -472,10 +488,9 @@ body:not(.remote) .dock { padding: 0; gap: 0; background: none; box-shadow: none
     <button class="rk" data-c="playpause" aria-label="Play or pause" style="width:68px;height:68px"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5v14l9-7z"/><rect x="15" y="5" width="2.6" height="14" rx="1"/><rect x="19.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
     <div class="side r"><button class="rk small" data-c="forward" aria-label="Fast forward"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8.5-6zM3 6v12l8.5-6z"/></svg></button></div>
   </div>
-  <div class="rocker">
-    <button data-c="voldown" aria-label="Volume down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4"/></svg></button>
-    <button data-c="mute" aria-label="Mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="m17 9 5 6M22 9l-5 6"/></svg></button>
-    <button data-c="volup" aria-label="Volume up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4M19 10v4"/></svg></button>
+  <div id="vol">
+    <button id="volMute" aria-label="Mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="w1" d="M16.5 9.5a3.5 3.5 0 0 1 0 5"/><path class="w2" d="M19 7a7 7 0 0 1 0 10"/><path class="x" d="m17 9 5 6M22 9l-5 6" style="display:none"/></svg></button>
+    <div id="volBar" class="unknown"><div class="fill"></div><span class="lbl">VOLUME</span><span class="num">–</span></div>
   </div>
   <div class="shelf">
     <button class="app" data-c="open:netflix"><i style="background:#000;color:#e50914;font-size:26px">N</i>Netflix</button>
@@ -534,7 +549,8 @@ function relayConnect() {
   if (!window.mqtt || !okCode(code)) return;
   const c = mqtt.connect(BROKERS[mqIdx % BROKERS.length], { reconnectPeriod: 0, connectTimeout: 8000, keepalive: 45, clean: true });
   mq = c; let up = false;
-  c.on("connect", () => { up = mqUp = true; linkChanged(true); });
+  c.on("connect", () => { up = mqUp = true; c.subscribe(code + "/volume"); linkChanged(true); });
+  c.on("message", (t, m) => { if (t.endsWith("/volume") && typeof onTvVolume === "function") { try { onTvVolume(JSON.parse(m.toString())); } catch (e) {} } });
   c.on("close", () => { c.removeAllListeners("close"); mqUp = false; linkChanged(false); if (!up) mqIdx++; setTimeout(relayConnect, up ? 800 : 2500); });
   c.on("error", () => {});
 }
@@ -999,6 +1015,66 @@ function onLink(up) {
   if (up) { rstatus.classList.remove("err"); rstatus.textContent = READY; }
   else if (!document.hidden) { rstatus.classList.remove("err"); rstatus.textContent = "Connecting to your TV…"; }
 }
+// ---------- volume slider ----------
+// The TV reports its real level; dragging sets an exact level ("vol:NN"), tapping steps by 2.
+const volBar = $("volBar"), volNum = volBar.querySelector(".num"), volMute = $("volMute");
+const vol = { v: null, max: 100, muted: false, lastSet: 0, lastHeard: 24 };
+function paintVol() {
+  const known = vol.v !== null, shown = vol.muted ? vol.lastHeard : vol.v;
+  volBar.classList.toggle("unknown", !known); volBar.classList.toggle("muted", vol.muted);
+  volBar.style.setProperty("--lv", known ? Math.round(shown / vol.max * 100) : 0);
+  volNum.textContent = !known ? "–" : vol.muted ? "Muted" : shown;
+  volMute.classList.toggle("on", vol.muted);
+  const svg = volMute.querySelector("svg"), level = known ? shown / vol.max : .5;
+  svg.querySelector(".x").style.display = vol.muted ? "" : "none";
+  svg.querySelector(".w1").style.display = !vol.muted && level > 0 ? "" : "none";
+  svg.querySelector(".w2").style.display = !vol.muted && level > .45 ? "" : "none";
+}
+function onTvVolume(st) {
+  if (Date.now() - vol.lastSet < 1500 || volBar.classList.contains("drag")) { vol.max = st.max || vol.max; return; } // our own change echoing back
+  vol.max = st.max || 100; vol.muted = !!st.muted;
+  if (!st.muted) { vol.v = st.v; vol.lastHeard = st.v; } else if (vol.v === null) vol.v = 0;
+  paintVol();
+}
+let volSendTimer = 0, volPending = null;
+function setVol(level, now) {
+  level = Math.max(0, Math.min(vol.max, Math.round(level)));
+  const before = vol.v;
+  vol.v = level; vol.lastHeard = level; vol.muted = false; vol.lastSet = Date.now(); paintVol();
+  if (before !== null && navigator.vibrate && Math.floor(before / 5) !== Math.floor(level / 5)) navigator.vibrate(4);
+  volPending = level;
+  if (now) { clearTimeout(volSendTimer); volSendTimer = 0; command("vol:" + level); volPending = null; return; }
+  if (!volSendTimer) volSendTimer = setTimeout(() => { volSendTimer = 0; if (volPending !== null) { command("vol:" + volPending); volPending = null; } }, 120);
+}
+let vDrag = null;
+volBar.addEventListener("pointerdown", e => {
+  volBar.setPointerCapture(e.pointerId);
+  vDrag = { x: e.clientX, start: vol.v === null ? vol.lastHeard : (vol.muted ? vol.lastHeard : vol.v), moved: false };
+});
+volBar.addEventListener("pointermove", e => {
+  if (!vDrag) return;
+  const dx = e.clientX - vDrag.x;
+  if (!vDrag.moved && Math.abs(dx) < 6) return;
+  vDrag.moved = true; volBar.classList.add("drag");
+  setVol(vDrag.start + dx / volBar.getBoundingClientRect().width * vol.max * .6);   // a full swipe moves 60 steps: fine control
+});
+function volEnd(e) {
+  if (!vDrag) return;
+  const d = vDrag; vDrag = null; volBar.classList.remove("drag");
+  if (d.moved) { setVol(vol.v, true); return; }
+  // a tap: right half louder, left half quieter
+  const r = volBar.getBoundingClientRect(), up = e.clientX > r.left + r.width / 2;
+  if (vol.v === null) { command(up ? "volup" : "voldown"); return; }
+  setVol((vol.muted ? vol.lastHeard : vol.v) + (up ? 2 : -2), true);
+}
+volBar.addEventListener("pointerup", volEnd);
+volBar.addEventListener("pointercancel", () => { vDrag = null; volBar.classList.remove("drag"); });
+volMute.onclick = () => {
+  vol.muted = !vol.muted; vol.lastSet = Date.now(); if (vol.v === null) vol.v = 0; paintVol();
+  command(vol.muted ? "muteon" : "unmute");
+};
+paintVol();
+
 // power: tap for a small menu (on / off)
 const powerMenu = $("powerMenu");
 $("power").onclick = () => powerMenu.classList.add("show");
