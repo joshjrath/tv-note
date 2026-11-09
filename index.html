@@ -134,6 +134,44 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
 .des.on i { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text); transform: scale(1.04); }
 .des.on span { color: var(--text); }
 
+/* Note / Remote switch */
+#mode { flex: none; }
+#mode button { padding: 0 14px; font-size: 15px; }
+body.remote #wrap, body.remote .dock, body.remote #send, body.remote #status { display: none; }
+#remote { display: none; width: 100%; max-width: 440px; flex: 1; min-height: 0; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+body.remote #remote { display: flex; }
+
+/* touchpad: swipe to move, tap the middle for OK, tap an edge to step */
+#touch { position: relative; width: min(100%, 46vh); aspect-ratio: 1; border-radius: 40px; touch-action: none;
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.10), rgba(255,255,255,.03) 70%);
+  box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi), 0 30px 80px -30px rgba(0,0,0,.9);
+  -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); overflow: hidden; }
+#touch .chev { position: absolute; color: rgba(255,255,255,.35); width: 26px; height: 26px; pointer-events: none; transition: color 150ms, transform 150ms; }
+#touch .chev.lit { color: #fff; }
+#touch .c-up { top: 16px; left: calc(50% - 13px); } #touch .c-down { bottom: 16px; left: calc(50% - 13px); }
+#touch .c-left { left: 16px; top: calc(50% - 13px); } #touch .c-right { right: 16px; top: calc(50% - 13px); }
+#touch .okdot { position: absolute; left: 50%; top: 50%; width: 34%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); display: grid; place-items: center; font-size: 15px; font-weight: 700; color: rgba(255,255,255,.55);
+  transition: background 150ms, transform 150ms; pointer-events: none; }
+#touch .okdot.lit { background: rgba(255,255,255,.16); transform: translate(-50%, -50%) scale(.94); color: #fff; }
+#touch .ripple { position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,.35), transparent 70%); animation: ripple 500ms var(--ease) forwards; }
+@keyframes ripple { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+
+.keys { width: 100%; display: flex; justify-content: center; gap: 14px; }
+.rk { width: 58px; height: 58px; border: 0; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(255,255,255,.09); box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi);
+  transition: transform 140ms var(--ease), background 140ms; }
+.rk svg { width: 24px; height: 24px; }
+.rk:active { transform: scale(.9); background: rgba(255,255,255,.2); }
+.rk.wide { width: auto; padding: 0 18px; border-radius: 999px; font-size: 15px; font-weight: 600; gap: 6px; display: flex; align-items: center; }
+.apps { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.apps button { height: 46px; border: 0; border-radius: 14px; font-size: 13.5px; font-weight: 700; letter-spacing: -.01em;
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.2); transition: transform 140ms var(--ease); }
+.apps button:active { transform: scale(.93); }
+#rstatus { font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.4; min-height: 2.8em; }
+#rstatus.err { color: #ff6961; }
+
 /* sheets */
 .sheet { position: fixed; inset: 0; display: none; flex-direction: column; justify-content: center; gap: 14px; padding: 28px;
   background: rgba(5,5,7,.8); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); z-index: 5; }
@@ -154,7 +192,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
 <body>
 <div class="aura"></div>
 <header>
-  <h1>TV Note</h1>
+  <div class="seg" id="mode"><button data-m="note" class="on">Note</button><button data-m="remote">Remote</button></div>
   <div class="hright">
     <div id="status"><i></i><span>Draw, then send</span></div>
     <button id="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Send</button>
@@ -222,6 +260,39 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
   </div>
 
   <div id="paint"><div id="sizes"></div><div class="scroll" id="colors"></div></div>
+</div>
+
+<div id="remote">
+  <div id="touch">
+    <svg class="chev c-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>
+    <svg class="chev c-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    <svg class="chev c-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+    <svg class="chev c-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    <div class="okdot">OK</div>
+  </div>
+  <div class="keys">
+    <button class="rk wide" data-c="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Back</button>
+    <button class="rk wide" data-c="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg>Home</button>
+    <button class="rk" data-c="playpause" aria-label="Play or pause"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5v14l9-7z"/><rect x="15" y="5" width="2.6" height="14" rx="1"/><rect x="19.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+  </div>
+  <div class="keys">
+    <button class="rk" data-c="rewind" aria-label="Rewind"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 6v12L2.5 12zM21 6v12l-8.5-6z"/></svg></button>
+    <button class="rk" data-c="forward" aria-label="Fast forward"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8.5-6zM3 6v12l8.5-6z"/></svg></button>
+    <button class="rk" data-c="voldown" aria-label="Volume down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4"/></svg></button>
+    <button class="rk" data-c="mute" aria-label="Mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="m17 9 5 6M22 9l-5 6"/></svg></button>
+    <button class="rk" data-c="volup" aria-label="Volume up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4M19 10v4"/></svg></button>
+  </div>
+  <div class="apps">
+    <button data-c="open:netflix" style="background:#000;color:#e50914">NETFLIX</button>
+    <button data-c="open:prime" style="background:#0f171e;color:#1a98ff">prime</button>
+    <button data-c="open:crave" style="background:#19123f;color:#fff">crave</button>
+    <button data-c="open:youtube" style="background:#fff;color:#ff0033">YouTube</button>
+    <button data-c="open:disney" style="background:#0e2366;color:#fff">Disney+</button>
+    <button data-c="open:hulu" style="background:#1ce783;color:#0b0c0f">hulu</button>
+    <button data-c="settings" style="background:rgba(255,255,255,.1)">Settings</button>
+    <button data-c="open:firetv" style="background:rgba(255,255,255,.1)">Fire TV</button>
+  </div>
+  <div id="rstatus">Swipe or tap the pad to move, tap the middle for OK.<br>Arrows work on your home screen, YouTube and Prime Video.</div>
 </div>
 
 <div class="sheet" id="pair">
@@ -650,6 +721,66 @@ sendBtn.onclick = async () => {
   } catch (e) { setStatus("Not sent. Try again.", "err"); }
   sendBtn.disabled = false;
 };
+
+// ---------- Remote: control the TV from anywhere ----------
+// Each press is one short message on "<code>-ctl". The home screen app on the TV carries it out.
+const rstatus = $("rstatus"), touch = $("touch");
+let lastErr = 0;
+async function command(c) {
+  if (!okCode(code)) return pairEl.classList.add("show");
+  if (navigator.vibrate) navigator.vibrate(6);
+  try {
+    const r = await fetch(RELAY + encodeURIComponent(code) + "-ctl", { method: "POST", body: c, keepalive: true });
+    if (r.status === 429) throw new Error("slow");
+    if (!r.ok) throw new Error(r.status);
+    if (Date.now() - lastErr > 4000) rstatus.classList.remove("err");
+  } catch (e) {
+    lastErr = Date.now(); rstatus.classList.add("err");
+    rstatus.innerHTML = e.message === "slow"
+      ? "Too many presses in a row. The free relay allows about 60 quickly,<br>then one every 5 seconds."
+      : "Couldn't reach your TV. Check your internet connection.";
+  }
+}
+$("mode").querySelectorAll("button").forEach(b => b.onclick = () => {
+  choose($("mode"), b); document.body.classList.toggle("remote", b.dataset.m === "remote");
+  if (b.dataset.m === "note") size();
+});
+document.querySelectorAll("#remote [data-c]").forEach(b => b.onclick = () => command(b.dataset.c));
+
+const chev = d => touch.querySelector(".c-" + d), okDot = touch.querySelector(".okdot");
+function lightUp(el) { el.classList.add("lit"); setTimeout(() => el.classList.remove("lit"), 180); }
+function ripple(x, y) { const r = document.createElement("i"); r.className = "ripple"; r.style.left = x + "px"; r.style.top = y + "px"; touch.appendChild(r); setTimeout(() => r.remove(), 520); }
+let tStart = null;
+touch.addEventListener("pointerdown", e => {
+  touch.setPointerCapture(e.pointerId);
+  const r = touch.getBoundingClientRect();
+  tStart = { x: e.clientX, y: e.clientY, ox: e.clientX, oy: e.clientY, steps: 0, rx: e.clientX - r.left, ry: e.clientY - r.top };
+});
+touch.addEventListener("pointermove", e => {
+  if (!tStart) return;
+  const dx = e.clientX - tStart.x, dy = e.clientY - tStart.y, STEP = 64;   // every 64 px of swipe = one step
+  if (Math.max(Math.abs(dx), Math.abs(dy)) < STEP) return;
+  const d = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
+  command(d); lightUp(chev(d)); tStart.steps++; tStart.x = e.clientX; tStart.y = e.clientY;
+});
+function touchEnd(e) {
+  if (!tStart) return;
+  const s = tStart; tStart = null;
+  if (s.steps) return;
+  const moved = Math.hypot(e.clientX - s.ox, e.clientY - s.oy);
+  if (moved > 24) { // a short swipe still counts as one step
+    const dx = e.clientX - s.ox, dy = e.clientY - s.oy, d = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
+    command(d); lightUp(chev(d)); return;
+  }
+  // a tap: middle = OK, edges = one step that way
+  const r = touch.getBoundingClientRect(), x = s.rx / r.width - .5, y = s.ry / r.height - .5;
+  ripple(s.rx, s.ry);
+  if (Math.hypot(x, y) < .2) { command("ok"); lightUp(okDot); return; }
+  const d = Math.abs(x) > Math.abs(y) ? (x > 0 ? "right" : "left") : (y > 0 ? "down" : "up");
+  command(d); lightUp(chev(d));
+}
+touch.addEventListener("pointerup", touchEnd);
+touch.addEventListener("pointercancel", () => { tStart = null; });
 
 size();
 if (items.length || bg !== "none") setStatus("Draft not sent yet", "dirty");
