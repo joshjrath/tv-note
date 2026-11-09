@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TV Note">
+<meta name="theme-color" content="#050507">
+<title>TV Note</title>
+<style>
+:root {
+  --bg: #050507; --text: #f5f5f7; --muted: rgba(235,235,245,.55);
+  --glass: rgba(255,255,255,.07); --edge: rgba(255,255,255,.12); --hi: rgba(255,255,255,.22);
+  --ease: cubic-bezier(.22,.8,.22,1); --spring: cubic-bezier(.3,1.4,.5,1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior: none;
+  font-family: -apple-system, "SF Pro Text", Inter, Roboto, sans-serif; -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none; user-select: none; }
+
+/* soft moving light behind everything */
+.aura { position: fixed; inset: -20%; z-index: -1; filter: blur(60px); opacity: .55; pointer-events: none;
+  background:
+    radial-gradient(35% 30% at 20% 15%, rgba(120, 90, 255, .55), transparent 70%),
+    radial-gradient(30% 28% at 85% 30%, rgba(255, 90, 160, .35), transparent 70%),
+    radial-gradient(40% 35% at 60% 95%, rgba(40, 170, 255, .35), transparent 70%);
+  animation: drift 18s ease-in-out infinite alternate; }
+@keyframes drift { to { transform: translate3d(4%, -3%, 0) rotate(8deg) scale(1.08); } }
+
+body { display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom)); }
+
+header { width: 100%; max-width: 520px; display: flex; align-items: center; justify-content: space-between; padding: 2px 4px; }
+h1 { font-size: 28px; font-weight: 700; letter-spacing: -.025em; }
+h1 span { font-weight: 400; color: var(--muted); }
+#status { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; letter-spacing: .01em; color: var(--muted);
+  background: var(--glass); box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); transition: color 300ms; }
+#status i { width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; transition: background 300ms; }
+#status.live { color: var(--text); } #status.live i { background: #30d158; box-shadow: 0 0 10px #30d158; }
+#status.busy i { background: #ffd60a; animation: pulse 900ms ease-in-out infinite; }
+#status.err { color: #ff6961; } #status.err i { background: #ff453a; }
+@keyframes pulse { 50% { opacity: .3; } }
+
+/* the pad: same 4:5 shape as the card on the TV */
+#wrap { flex: 1; width: 100%; display: grid; place-items: center; min-height: 0; }
+#pad { position: relative; aspect-ratio: 4 / 5; height: 100%; max-width: 100%; max-height: 100%;
+  border-radius: 34px; overflow: hidden; touch-action: none;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,.09) 1px, transparent 1.4px) 0 0 / 22px 22px,
+    linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi), 0 30px 80px -30px rgba(0,0,0,.9);
+  -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+#empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; pointer-events: none;
+  color: var(--muted); font-size: 15px; line-height: 1.5; transition: opacity 400ms var(--ease); }
+#empty b { display: block; font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: -.01em; margin-bottom: 2px; }
+#flash { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.7), inset 0 0 60px rgba(255,255,255,.12); }
+#flash.go { animation: flash 900ms var(--ease); }
+@keyframes flash { 15% { opacity: 1; } }
+
+/* floating glass toolbar */
+.dock { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 10px; padding: 12px;
+  border-radius: 28px; background: var(--glass);
+  box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi), 0 20px 50px -20px rgba(0,0,0,.8);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6); backdrop-filter: blur(30px) saturate(1.6); }
+.line { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.seg { display: flex; padding: 3px; border-radius: 999px; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 .5px var(--edge); }
+.seg button { height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--muted);
+  font: 600 14px/1 inherit; display: flex; align-items: center; gap: 6px; transition: background 200ms, color 200ms; }
+.seg button svg { width: 16px; height: 16px; }
+.seg button.on { background: rgba(255,255,255,.16); color: var(--text); box-shadow: inset 0 1px 0 var(--hi); }
+.icons { display: flex; gap: 8px; }
+.ib { width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(255,255,255,.08); color: var(--text); box-shadow: inset 0 0 0 .5px var(--edge); transition: transform 160ms var(--ease), background 200ms; }
+.ib svg { width: 19px; height: 19px; }
+.ib:active { transform: scale(.9); }
+.ib.warn { background: rgba(255,69,58,.85); }
+.colors { display: flex; justify-content: space-between; padding: 2px 4px; }
+.dot { width: 30px; height: 30px; border-radius: 50%; border: 0; position: relative; transition: transform 260ms var(--spring); }
+.dot::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; box-shadow: 0 0 0 2px var(--text); opacity: 0; transform: scale(.8); transition: opacity 200ms, transform 260ms var(--spring); }
+.dot.on { transform: scale(1.08); }
+.dot.on::after { opacity: 1; transform: none; }
+
+/* pairing */
+#pair { position: fixed; inset: 0; display: none; flex-direction: column; justify-content: center; gap: 16px; padding: 32px; background: rgba(5,5,7,.86);
+  -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); }
+#pair.show { display: flex; }
+#pair h2 { font-size: 30px; letter-spacing: -.02em; }
+#pair p { color: var(--muted); font-size: 16px; line-height: 1.45; }
+#pair input { height: 52px; border-radius: 16px; border: 0; padding: 0 16px; background: var(--glass); color: var(--text); font: 16px inherit;
+  box-shadow: inset 0 0 0 .5px var(--edge); -webkit-user-select: text; user-select: text; }
+#pair button { height: 52px; border-radius: 16px; border: 0; background: var(--text); color: #000; font: 600 17px inherit; }
+</style>
+</head>
+<body>
+<div class="aura"></div>
+<header><h1>TV Note <span>✎</span></h1><div id="status"><i></i><span>Ready</span></div></header>
+
+<div id="wrap"><div id="pad"><canvas id="c"></canvas>
+  <div id="empty"><div><b>Draw something</b>It shows up on your TV a second later.</div></div>
+  <div id="flash"></div></div></div>
+
+<div class="dock">
+  <div class="line">
+    <div class="seg" id="brushes">
+      <button data-b="pen" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>Pen</button>
+      <button data-b="marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-8 8H6v-6z"/><path d="M4 21h16"/></svg>Marker</button>
+      <button data-b="glow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>Glow</button>
+    </div>
+    <div class="icons">
+      <button class="ib" id="undo" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="ib" id="clear" aria-label="Clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+    </div>
+  </div>
+  <div class="colors" id="colors"></div>
+</div>
+
+<div id="pair">
+  <h2>Pair with your TV</h2>
+  <p>Paste the pairing code for your TV. You only do this once on this phone.</p>
+  <input id="code" placeholder="tvnote-…" autocapitalize="off" autocorrect="off" spellcheck="false">
+  <button id="save">Pair</button>
+</div>
+
+<script>
+"use strict";
+const RELAY = "https://ntfy.sh/";
+const COLORS = ["#ffffff", "#ffd60a", "#ff8a65", "#ff6ad5", "#a78bfa", "#64d2ff", "#34d399"];
+const OUT_W = 720, OUT_H = 900;               // image the TV receives (4:5)
+const BRUSH = { pen: 0.011, marker: 0.032, glow: 0.009 };   // width as a fraction of pad width
+
+// ---------- pairing code: from the link (#code) or typed once; kept on this phone only ----------
+const okCode = c => /^[\w-]{12,64}$/.test(c || "");
+function save(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+let code = decodeURIComponent(location.hash.slice(1)) || load("code") || "";
+if (location.hash) { if (okCode(code)) save("code", code); history.replaceState(null, "", location.pathname); }
+const pairEl = document.getElementById("pair");
+if (!okCode(code)) pairEl.classList.add("show");
+document.getElementById("save").onclick = () => {
+  const v = document.getElementById("code").value.trim();
+  if (!okCode(v)) return;
+  code = v; save("code", v); pairEl.classList.remove("show");
+};
+
+// ---------- tools ----------
+let color = COLORS[0], brush = "pen";
+const colorsEl = document.getElementById("colors");
+COLORS.forEach((c, i) => {
+  const b = document.createElement("button");
+  b.className = "dot" + (i === 0 ? " on" : ""); b.style.background = c; b.setAttribute("aria-label", "Colour " + (i + 1));
+  b.onclick = () => { color = c; [...colorsEl.children].forEach(x => x.classList.toggle("on", x === b)); };
+  colorsEl.appendChild(b);
+});
+document.querySelectorAll("#brushes button").forEach(b => b.onclick = () => {
+  brush = b.dataset.b; document.querySelectorAll("#brushes button").forEach(x => x.classList.toggle("on", x === b));
+});
+
+// ---------- drawing ----------
+const pad = document.getElementById("pad"), cv = document.getElementById("c"), ctx = cv.getContext("2d");
+const emptyEl = document.getElementById("empty");
+let strokes = [], cur = null, last = null;
+
+function size() {
+  const r = pad.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 3);
+  cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
+  draw(ctx, cv.width, cv.height);
+}
+addEventListener("resize", size);
+
+// Points are stored 0..1 (plus a width factor), so the TV copy is drawn sharp at its own size.
+function strokePath(g, s, w, h, scale) {
+  const p = s.pts, base = BRUSH[s.brush] * w * scale;
+  if (p.length === 1) { g.beginPath(); g.arc(p[0][0] * w, p[0][1] * h, base * p[0][2] / 2, 0, Math.PI * 2); g.fillStyle = g.strokeStyle; g.fill(); return; }
+  for (let i = 1; i < p.length; i++) {
+    const a = p[i - 1], b = p[i];
+    const ax = i === 1 ? a[0] : (p[i - 2][0] + a[0]) / 2, ay = i === 1 ? a[1] : (p[i - 2][1] + a[1]) / 2;
+    const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+    g.lineWidth = base * (s.brush === "pen" ? (a[2] + b[2]) / 2 : 1);
+    g.beginPath(); g.moveTo(ax * w, ay * h); g.quadraticCurveTo(a[0] * w, a[1] * h, (i === p.length - 1 ? b[0] : mx) * w, (i === p.length - 1 ? b[1] : my) * h); g.stroke();
+  }
+}
+function draw(g, w, h) {
+  g.clearRect(0, 0, w, h);
+  g.lineCap = "round"; g.lineJoin = "round";
+  for (const s of strokes) {
+    g.save();
+    if (s.brush === "marker") { g.globalAlpha = .82; g.strokeStyle = s.color; strokePath(g, s, w, h, 1); }
+    else if (s.brush === "glow") {
+      g.shadowColor = s.color; g.shadowBlur = w * .045; g.strokeStyle = s.color; strokePath(g, s, w, h, 1.6);
+      g.shadowBlur = w * .015; strokePath(g, s, w, h, 1.6);
+      g.shadowBlur = 0; g.strokeStyle = "rgba(255,255,255,.9)"; strokePath(g, s, w, h, .55);
+    } else { g.strokeStyle = s.color; strokePath(g, s, w, h, 1); }
+    g.restore();
+  }
+  emptyEl.style.opacity = strokes.length ? 0 : 1;
+}
+function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }
+cv.addEventListener("pointerdown", e => {
+  cv.setPointerCapture(e.pointerId);
+  const [x, y] = pt(e);
+  cur = { color, brush, pts: [[x, y, 1]] }; strokes.push(cur);
+  last = { x, y, t: e.timeStamp, w: 1 };
+  clearTimeout(sendTimer); draw(ctx, cv.width, cv.height);
+});
+cv.addEventListener("pointermove", e => {
+  if (!cur) return;
+  for (const ev of (e.getCoalescedEvents ? e.getCoalescedEvents() : [e])) {
+    const [x, y] = pt(ev), dt = Math.max(1, ev.timeStamp - last.t), d = Math.hypot(x - last.x, y - last.y);
+    if (d < 0.002) continue;
+    const speed = d / dt * 1000;                                  // pad-widths per second
+    const target = Math.max(.45, Math.min(1.35, 1.45 - speed * .35)); // faster = thinner, like ink
+    const w = last.w * .75 + target * .25;
+    cur.pts.push([x, y, w]); last = { x, y, t: ev.timeStamp, w };
+  }
+  draw(ctx, cv.width, cv.height);
+});
+function end() { if (!cur) return; cur = null; queueSend(); }
+cv.addEventListener("pointerup", end);
+cv.addEventListener("pointercancel", end);
+
+document.getElementById("undo").onclick = () => { if (!strokes.length) return; strokes.pop(); draw(ctx, cv.width, cv.height); strokes.length ? queueSend() : sendClear(); };
+const clearBtn = document.getElementById("clear");
+let clearArmed = 0;
+clearBtn.onclick = () => {   // tap twice to clear, so a stray tap doesn't wipe the TV
+  if (!strokes.length) return;
+  if (!clearArmed) { clearBtn.classList.add("warn"); clearArmed = setTimeout(() => { clearBtn.classList.remove("warn"); clearArmed = 0; }, 1800); return; }
+  clearTimeout(clearArmed); clearArmed = 0; clearBtn.classList.remove("warn");
+  strokes = []; draw(ctx, cv.width, cv.height); sendClear();
+};
+
+// ---------- sending: 1 second after you lift your finger ----------
+const statusEl = document.getElementById("status"), statusText = statusEl.querySelector("span"), flash = document.getElementById("flash");
+let sendTimer = 0;
+function setStatus(t, cls) { statusText.textContent = t; statusEl.className = cls || ""; }
+function sent() {
+  flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go");
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+function queueSend() { clearTimeout(sendTimer); setStatus("Sending", "busy"); sendTimer = setTimeout(send, 1000); }
+async function send() {
+  if (!okCode(code)) return pairEl.classList.add("show");
+  const out = document.createElement("canvas"); out.width = OUT_W; out.height = OUT_H;
+  draw(out.getContext("2d"), OUT_W, OUT_H);
+  draw(ctx, cv.width, cv.height); // draw() toggles the hint; redraw the screen copy
+  const blob = await new Promise(ok => out.toBlob(ok, "image/png"));
+  try {
+    const r = await fetch(RELAY + encodeURIComponent(code) + "?filename=note.png", { method: "PUT", body: blob });
+    if (!r.ok) throw new Error(r.status);
+    setStatus("On your TV", "live"); sent();
+  } catch (e) { setStatus("Not sent", "err"); }
+}
+async function sendClear() {
+  clearTimeout(sendTimer);
+  if (!okCode(code)) return;
+  try {
+    const r = await fetch(RELAY + encodeURIComponent(code), { method: "POST", body: "clear" });
+    setStatus(r.ok ? "Cleared" : "Not cleared", r.ok ? "live" : "err");
+  } catch (e) { setStatus("Not cleared", "err"); }
+}
+
+size();
+</script>
+</body>
+</html>
