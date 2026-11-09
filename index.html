@@ -18,8 +18,8 @@
 html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior: none;
   font-family: -apple-system, "SF Pro Text", Inter, Roboto, sans-serif; -webkit-font-smoothing: antialiased;
   -webkit-user-select: none; user-select: none; }
+button { font: inherit; color: inherit; }
 
-/* soft moving light behind everything */
 .aura { position: fixed; inset: -20%; z-index: -1; filter: blur(60px); opacity: .55; pointer-events: none;
   background:
     radial-gradient(35% 30% at 20% 15%, rgba(120, 90, 255, .55), transparent 70%),
@@ -28,14 +28,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); overflow: 
   animation: drift 18s ease-in-out infinite alternate; }
 @keyframes drift { to { transform: translate3d(4%, -3%, 0) rotate(8deg) scale(1.08); } }
 
-body { display: flex; flex-direction: column; align-items: center; gap: 14px;
-  padding: max(16px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom)); }
+body { display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom)); }
 
 header { width: 100%; max-width: 520px; display: flex; align-items: center; justify-content: space-between; padding: 2px 4px; }
-h1 { font-size: 28px; font-weight: 700; letter-spacing: -.025em; }
+h1 { font-size: 26px; font-weight: 700; letter-spacing: -.025em; }
 h1 span { font-weight: 400; color: var(--muted); }
 #status { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 999px;
-  font-size: 13px; font-weight: 600; letter-spacing: .01em; color: var(--muted);
+  font-size: 13px; font-weight: 600; color: var(--muted);
   background: var(--glass); box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi);
   -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); transition: color 300ms; }
 #status i { width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; transition: background 300ms; }
@@ -44,10 +44,10 @@ h1 span { font-weight: 400; color: var(--muted); }
 #status.err { color: #ff6961; } #status.err i { background: #ff453a; }
 @keyframes pulse { 50% { opacity: .3; } }
 
-/* the pad: same 4:5 shape as the card on the TV */
+/* pad: same 4:5 shape as the card on the TV */
 #wrap { flex: 1; width: 100%; display: grid; place-items: center; min-height: 0; }
 #pad { position: relative; aspect-ratio: 4 / 5; height: 100%; max-width: 100%; max-height: 100%;
-  border-radius: 34px; overflow: hidden; touch-action: none;
+  border-radius: 32px; overflow: hidden; touch-action: none;
   background:
     radial-gradient(circle at 1px 1px, rgba(255,255,255,.09) 1px, transparent 1.4px) 0 0 / 22px 22px,
     linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
@@ -56,44 +56,87 @@ h1 span { font-weight: 400; color: var(--muted); }
 canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
 #empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; pointer-events: none;
   color: var(--muted); font-size: 15px; line-height: 1.5; transition: opacity 400ms var(--ease); }
-#empty b { display: block; font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: -.01em; margin-bottom: 2px; }
+#empty b { display: block; font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
 #flash { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
   box-shadow: inset 0 0 0 2px rgba(255,255,255,.7), inset 0 0 60px rgba(255,255,255,.12); }
 #flash.go { animation: flash 900ms var(--ease); }
 @keyframes flash { 15% { opacity: 1; } }
+#del { position: absolute; top: 12px; right: 12px; height: 36px; padding: 0 14px; border: 0; border-radius: 999px;
+  background: rgba(255,69,58,.9); color: #fff; font-size: 14px; font-weight: 600; display: none; align-items: center; gap: 6px;
+  box-shadow: 0 8px 20px -6px rgba(0,0,0,.6); }
+#del.show { display: flex; }
+#del svg { width: 15px; height: 15px; }
 
-/* floating glass toolbar */
-.dock { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 10px; padding: 12px;
-  border-radius: 28px; background: var(--glass);
+/* dock */
+.dock { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 10px; padding: 10px;
+  border-radius: 26px; background: var(--glass);
   box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi), 0 20px 50px -20px rgba(0,0,0,.8);
   -webkit-backdrop-filter: blur(30px) saturate(1.6); backdrop-filter: blur(30px) saturate(1.6); }
-.line { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.seg { display: flex; padding: 3px; border-radius: 999px; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 .5px var(--edge); }
-.seg button { height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--muted);
-  font: 600 14px/1 inherit; display: flex; align-items: center; gap: 6px; transition: background 200ms, color 200ms; }
+.line { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.seg { display: flex; padding: 3px; border-radius: 999px; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 .5px var(--edge);
+  overflow-x: auto; scrollbar-width: none; }
+.seg::-webkit-scrollbar { display: none; }
+.seg button { flex: none; height: 32px; padding: 0 13px; border: 0; border-radius: 999px; background: transparent; color: var(--muted);
+  font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: background 200ms, color 200ms; }
 .seg button svg { width: 16px; height: 16px; }
 .seg button.on { background: rgba(255,255,255,.16); color: var(--text); box-shadow: inset 0 1px 0 var(--hi); }
-.icons { display: flex; gap: 8px; }
-.ib { width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center;
-  background: rgba(255,255,255,.08); color: var(--text); box-shadow: inset 0 0 0 .5px var(--edge); transition: transform 160ms var(--ease), background 200ms; }
-.ib svg { width: 19px; height: 19px; }
+.icons { display: flex; gap: 6px; flex: none; }
+.ib { width: 38px; height: 38px; border: 0; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 .5px var(--edge); transition: transform 160ms var(--ease), background 200ms; }
+.ib svg { width: 18px; height: 18px; }
 .ib:active { transform: scale(.9); }
 .ib.warn { background: rgba(255,69,58,.85); }
-.colors { display: flex; justify-content: space-between; padding: 2px 4px; }
-.dot { width: 30px; height: 30px; border-radius: 50%; border: 0; position: relative; transition: transform 260ms var(--spring); }
-.dot::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; box-shadow: 0 0 0 2px var(--text); opacity: 0; transform: scale(.8); transition: opacity 200ms, transform 260ms var(--spring); }
-.dot.on { transform: scale(1.08); }
-.dot.on::after { opacity: 1; transform: none; }
 
-/* pairing */
-#pair { position: fixed; inset: 0; display: none; flex-direction: column; justify-content: center; gap: 16px; padding: 32px; background: rgba(5,5,7,.86);
-  -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); }
-#pair.show { display: flex; }
-#pair h2 { font-size: 30px; letter-spacing: -.02em; }
-#pair p { color: var(--muted); font-size: 16px; line-height: 1.45; }
-#pair input { height: 52px; border-radius: 16px; border: 0; padding: 0 16px; background: var(--glass); color: var(--text); font: 16px inherit;
+.panel { display: none; flex-direction: column; gap: 10px; }
+.panel.on { display: flex; }
+.scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px 6px; scroll-snap-type: x proximity; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* colours */
+.dot { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 0; position: relative; scroll-snap-align: start;
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.25); transition: transform 260ms var(--spring); }
+.dot::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; box-shadow: 0 0 0 2px var(--text); opacity: 0; transform: scale(.8);
+  transition: opacity 200ms, transform 260ms var(--spring); }
+.dot.on::after { opacity: 1; transform: none; }
+.dot.custom { background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); overflow: visible; }
+.dot.custom input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; }
+#sizes { display: flex; gap: 6px; align-items: center; }
+#sizes button { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; }
+#sizes button i { display: block; border-radius: 50%; background: var(--muted); }
+#sizes button.on i { background: var(--text); }
+
+/* stickers */
+.stk { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-height: 128px; overflow-y: auto; scrollbar-width: none; }
+.stk::-webkit-scrollbar { display: none; }
+.stk button { aspect-ratio: 1; border: 0; border-radius: 12px; background: transparent; font-size: 26px; line-height: 1;
+  transition: transform 160ms var(--ease), background 160ms; }
+.stk button:active { transform: scale(.85); background: rgba(255,255,255,.1); }
+.textbtn { height: 38px; border: 0; border-radius: 12px; background: rgba(255,255,255,.1); font-size: 15px; font-weight: 600;
+  box-shadow: inset 0 0 0 .5px var(--edge); }
+.hint { font-size: 12.5px; color: var(--muted); text-align: center; }
+
+/* designs */
+.des { flex: none; width: 64px; display: flex; flex-direction: column; gap: 6px; align-items: center; border: 0; background: transparent; scroll-snap-align: start; }
+.des i { width: 56px; height: 70px; border-radius: 14px; box-shadow: inset 0 0 0 .5px rgba(255,255,255,.25); transition: transform 260ms var(--spring); }
+.des span { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.des.on i { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text); transform: scale(1.04); }
+.des.on span { color: var(--text); }
+
+/* sheets */
+.sheet { position: fixed; inset: 0; display: none; flex-direction: column; justify-content: center; gap: 14px; padding: 28px;
+  background: rgba(5,5,7,.8); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); z-index: 5; }
+.sheet.show { display: flex; }
+.sheet h2 { font-size: 28px; letter-spacing: -.02em; }
+.sheet p { color: var(--muted); font-size: 16px; line-height: 1.45; }
+.sheet input { height: 52px; border-radius: 16px; border: 0; padding: 0 16px; background: var(--glass); color: var(--text); font: 17px inherit;
   box-shadow: inset 0 0 0 .5px var(--edge); -webkit-user-select: text; user-select: text; }
-#pair button { height: 52px; border-radius: 16px; border: 0; background: var(--text); color: #000; font: 600 17px inherit; }
+.sheet .row { display: flex; gap: 10px; }
+.sheet .row button { flex: 1; height: 50px; border-radius: 16px; border: 0; font-weight: 600; font-size: 17px; }
+.primary { background: var(--text); color: #000 !important; }
+.secondary { background: var(--glass); box-shadow: inset 0 0 0 .5px var(--edge); }
+.fonts { display: flex; gap: 8px; }
+.fonts button { flex: 1; height: 44px; border: 0; border-radius: 12px; background: var(--glass); box-shadow: inset 0 0 0 .5px var(--edge); font-size: 17px; }
+.fonts button.on { background: rgba(255,255,255,.18); box-shadow: inset 0 0 0 1.5px var(--text); }
 </style>
 </head>
 <body>
@@ -101,37 +144,99 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
 <header><h1>TV Note <span>✎</span></h1><div id="status"><i></i><span>Ready</span></div></header>
 
 <div id="wrap"><div id="pad"><canvas id="c"></canvas>
-  <div id="empty"><div><b>Draw something</b>It shows up on your TV a second later.</div></div>
-  <div id="flash"></div></div></div>
+  <div id="empty"><div><b>Draw something</b>Add stickers and designs below.<br>It shows up on your TV a second later.</div></div>
+  <div id="flash"></div>
+  <button id="del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button>
+</div></div>
 
 <div class="dock">
   <div class="line">
-    <div class="seg" id="brushes">
-      <button data-b="pen" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>Pen</button>
-      <button data-b="marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-8 8H6v-6z"/><path d="M4 21h16"/></svg>Marker</button>
-      <button data-b="glow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>Glow</button>
+    <div class="seg" id="tabs">
+      <button data-t="draw" class="on">Draw</button>
+      <button data-t="stickers">Stickers</button>
+      <button data-t="designs">Designs</button>
     </div>
     <div class="icons">
       <button class="ib" id="undo" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
       <button class="ib" id="clear" aria-label="Clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
     </div>
   </div>
-  <div class="colors" id="colors"></div>
+
+  <div class="panel on" id="p-draw">
+    <div class="line">
+      <div class="seg" id="brushes">
+        <button data-b="pen" class="on">Pen</button>
+        <button data-b="marker">Marker</button>
+        <button data-b="glow">Glow</button>
+        <button data-b="rainbow">Rainbow</button>
+        <button data-b="spray">Spray</button>
+      </div>
+      <div id="sizes"></div>
+    </div>
+    <div class="scroll" id="colors"></div>
+  </div>
+
+  <div class="panel" id="p-stickers">
+    <button class="textbtn" id="addText">Aa&nbsp;&nbsp;Add text</button>
+    <div class="stk" id="stickers"></div>
+    <div class="hint">Drag to move. Pinch with two fingers to resize and turn.</div>
+  </div>
+
+  <div class="panel" id="p-designs">
+    <div class="scroll" id="designs"></div>
+  </div>
 </div>
 
-<div id="pair">
+<div class="sheet" id="pair">
   <h2>Pair with your TV</h2>
   <p>Paste the pairing code for your TV. You only do this once on this phone.</p>
   <input id="code" placeholder="tvnote-…" autocapitalize="off" autocorrect="off" spellcheck="false">
-  <button id="save">Pair</button>
+  <div class="row"><button class="primary" id="save">Pair</button></div>
+</div>
+
+<div class="sheet" id="textSheet">
+  <h2>Add text</h2>
+  <input id="textIn" maxlength="40" placeholder="Dinner at 7 ❤️" autocomplete="off">
+  <div class="fonts" id="fonts">
+    <button data-f="bold" class="on" style="font-weight:800">Bold</button>
+    <button data-f="script" style="font-family:'Snell Roundhand','Segoe Script',cursive">Script</button>
+    <button data-f="neon" style="font-weight:600;text-shadow:0 0 8px #ff6ad5">Neon</button>
+    <button data-f="type" style="font-family:'American Typewriter','Courier New',monospace">Type</button>
+  </div>
+  <div class="row"><button class="secondary" id="textCancel">Cancel</button><button class="primary" id="textAdd">Add</button></div>
 </div>
 
 <script>
 "use strict";
 const RELAY = "https://ntfy.sh/";
-const COLORS = ["#ffffff", "#ffd60a", "#ff8a65", "#ff6ad5", "#a78bfa", "#64d2ff", "#34d399"];
-const OUT_W = 720, OUT_H = 900;               // image the TV receives (4:5)
-const BRUSH = { pen: 0.011, marker: 0.032, glow: 0.009 };   // width as a fraction of pad width
+const OUT_W = 720, OUT_H = 900;  // image the TV receives (4:5)
+
+const COLORS = ["#ffffff", "#c7c7cc", "#1c1c1e", "#ff3b30", "#ff8a65", "#ff9500", "#ffd60a", "#fff3a0", "#a6e22e", "#34d399",
+  "#00c7be", "#64d2ff", "#0a84ff", "#5e5ce6", "#a78bfa", "#bf5af2", "#ff6ad5", "#ff2d55", "#f4c2c2", "#c69c6d", "#8b5a2b"];
+const STICKERS = ["❤️","💖","💕","✨","⭐","🌟","🔥","💯","😂","😍","🥰","😘","😎","🥳","😴","🤗","👋","👍","🙌","👏","🎉","🎊","🎁","🎂",
+  "🍿","🎬","📺","🎮","🎵","🎧","🍕","🍔","🌮","🍣","☕","🍷","🍪","🍩","🌙","☀️","🌈","⛅","❄️","🌸","🌻","🍀","🌊","🏖️",
+  "🐶","🐱","🐻","🦊","🐼","🦄","🦋","🐝","🏠","🚗","✈️","⚽","🏀","💤","💡","📌"];
+const DESIGNS = [
+  { id: "none",     name: "Glass",    css: "linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04))" },
+  { id: "midnight", name: "Midnight", css: "linear-gradient(160deg,#1b2a6b,#070b1f)", stops: [["#1b2a6b", 0], ["#070b1f", 1]] },
+  { id: "sunset",   name: "Sunset",   css: "linear-gradient(170deg,#ff9a5a,#ff4f81 55%,#6a2ca8)", stops: [["#ff9a5a", 0], ["#ff4f81", .55], ["#6a2ca8", 1]] },
+  { id: "aurora",   name: "Aurora",   css: "linear-gradient(160deg,#0b3d3a,#1fa37a 45%,#3b1f6b)", stops: [["#0b3d3a", 0], ["#1fa37a", .45], ["#3b1f6b", 1]] },
+  { id: "ocean",    name: "Ocean",    css: "linear-gradient(180deg,#56ccf2,#2f80ed 55%,#0b2a5b)", stops: [["#56ccf2", 0], ["#2f80ed", .55], ["#0b2a5b", 1]] },
+  { id: "peach",    name: "Peach",    css: "linear-gradient(160deg,#ffe1c6,#ffb199)", stops: [["#ffe1c6", 0], ["#ffb199", 1]] },
+  { id: "paper",    name: "Paper",    css: "#f6f0e1", solid: "#f6f0e1", lines: "rgba(80,110,170,.25)" },
+  { id: "chalk",    name: "Chalk",    css: "#1f3a2e", solid: "#1f3a2e", noise: true },
+  { id: "hearts",   name: "Love",     css: "linear-gradient(160deg,#ff8fb1,#ff4f81)", stops: [["#ff8fb1", 0], ["#ff4f81", 1]], pattern: "❤" },
+  { id: "stars",    name: "Stars",    css: "linear-gradient(180deg,#141a3a,#05060f)", stops: [["#141a3a", 0], ["#05060f", 1]], stars: true },
+  { id: "confetti", name: "Party",    css: "linear-gradient(160deg,#2b1055,#7597de)", stops: [["#2b1055", 0], ["#7597de", 1]], confetti: true }
+];
+const WIDTH = { pen: .011, marker: .03, glow: .009, rainbow: .016, spray: .05 };
+const SIZES = [.6, 1, 1.7];
+const FONTS = {
+  bold:   { css: '800 1em -apple-system, "SF Pro Display", Inter, sans-serif' },
+  script: { css: '400 1em "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive' },
+  neon:   { css: '600 1em -apple-system, "SF Pro Rounded", Inter, sans-serif', glow: true },
+  type:   { css: '400 1em "American Typewriter", "Courier New", monospace' }
+};
 
 // ---------- pairing code: from the link (#code) or typed once; kept on this phone only ----------
 const okCode = c => /^[\w-]{12,64}$/.test(c || "");
@@ -147,106 +252,245 @@ document.getElementById("save").onclick = () => {
   code = v; save("code", v); pairEl.classList.remove("show");
 };
 
-// ---------- tools ----------
-let color = COLORS[0], brush = "pen";
-const colorsEl = document.getElementById("colors");
+// ---------- state ----------
+// items, drawn in order: strokes {t:"s"}, stickers {t:"k"} and text {t:"x"}. Positions are 0..1 of the pad.
+let items = [], bg = "none", selected = null;
+let color = COLORS[0], brush = "pen", sizeMul = 1, tab = "draw", font = "bold";
+const undoStack = [];
+const snap = () => JSON.stringify({ items, bg });
+function remember() { undoStack.push(snap()); if (undoStack.length > 60) undoStack.shift(); }
+function restore(s) { const o = JSON.parse(s); items = o.items; bg = o.bg; selected = null; }
+
+// ---------- UI: tabs, brushes, sizes, colours, stickers, designs ----------
+const $ = id => document.getElementById(id);
+function choose(group, el) { group.querySelectorAll("button").forEach(b => b.classList.toggle("on", b === el)); }
+$("tabs").querySelectorAll("button").forEach(b => b.onclick = () => {
+  tab = b.dataset.t; choose($("tabs"), b);
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("on", p.id === "p-" + tab));
+});
+$("brushes").querySelectorAll("button").forEach(b => b.onclick = () => { brush = b.dataset.b; choose($("brushes"), b); });
+SIZES.forEach((m, i) => {
+  const b = document.createElement("button"), d = 6 + i * 6;
+  b.innerHTML = '<i style="width:' + d + 'px;height:' + d + 'px"></i>'; b.className = i === 1 ? "on" : "";
+  b.setAttribute("aria-label", ["Thin", "Medium", "Thick"][i]);
+  b.onclick = () => { sizeMul = m; choose($("sizes"), b); };
+  $("sizes").appendChild(b);
+});
+const colorsEl = $("colors");
+function pickColor(c, el) { color = c; colorsEl.querySelectorAll(".dot").forEach(x => x.classList.toggle("on", x === el)); }
 COLORS.forEach((c, i) => {
   const b = document.createElement("button");
-  b.className = "dot" + (i === 0 ? " on" : ""); b.style.background = c; b.setAttribute("aria-label", "Colour " + (i + 1));
-  b.onclick = () => { color = c; [...colorsEl.children].forEach(x => x.classList.toggle("on", x === b)); };
+  b.className = "dot" + (i === 0 ? " on" : ""); b.style.background = c; b.setAttribute("aria-label", "Colour " + c);
+  b.onclick = () => pickColor(c, b);
   colorsEl.appendChild(b);
 });
-document.querySelectorAll("#brushes button").forEach(b => b.onclick = () => {
-  brush = b.dataset.b; document.querySelectorAll("#brushes button").forEach(x => x.classList.toggle("on", x === b));
+{ // any colour
+  const b = document.createElement("label"); b.className = "dot custom"; b.setAttribute("aria-label", "Any colour");
+  const inp = document.createElement("input"); inp.type = "color"; inp.value = "#ff6ad5";
+  inp.oninput = () => { b.style.background = inp.value; pickColor(inp.value, b); };
+  b.appendChild(inp); colorsEl.appendChild(b);
+}
+STICKERS.forEach(s => {
+  const b = document.createElement("button"); b.textContent = s;
+  b.onclick = () => addThing({ t: "k", emoji: s, x: .5 + (Math.random() - .5) * .2, y: .45 + (Math.random() - .5) * .2, s: .2, r: (Math.random() - .5) * .3 });
+  $("stickers").appendChild(b);
+});
+DESIGNS.forEach((d, i) => {
+  const b = document.createElement("button"); b.className = "des" + (i === 0 ? " on" : "");
+  b.innerHTML = '<i style="background:' + d.css + '"></i><span>' + d.name + "</span>";
+  b.onclick = () => { if (bg === d.id) return; remember(); bg = d.id; choose($("designs"), b); redraw(); queueSend(); };
+  $("designs").appendChild(b);
 });
 
-// ---------- drawing ----------
-const pad = document.getElementById("pad"), cv = document.getElementById("c"), ctx = cv.getContext("2d");
-const emptyEl = document.getElementById("empty");
-let strokes = [], cur = null, last = null;
+// text
+const textSheet = $("textSheet"), textIn = $("textIn");
+$("addText").onclick = () => { textIn.value = ""; textSheet.classList.add("show"); setTimeout(() => textIn.focus(), 50); };
+$("fonts").querySelectorAll("button").forEach(b => b.onclick = () => { font = b.dataset.f; choose($("fonts"), b); });
+$("textCancel").onclick = () => textSheet.classList.remove("show");
+$("textAdd").onclick = () => {
+  const t = textIn.value.trim(); textSheet.classList.remove("show"); textIn.blur();
+  if (t) addThing({ t: "x", text: t, x: .5, y: .5, s: .11, r: 0, color, font });
+};
+function addThing(o) { remember(); items.push(o); selected = o; redraw(); queueSend(); }
 
+// ---------- drawing ----------
+const pad = $("pad"), cv = $("c"), ctx = cv.getContext("2d"), emptyEl = $("empty"), delBtn = $("del");
 function size() {
   const r = pad.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 3);
   cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
-  draw(ctx, cv.width, cv.height);
+  redraw();
 }
 addEventListener("resize", size);
 
-// Points are stored 0..1 (plus a width factor), so the TV copy is drawn sharp at its own size.
-function strokePath(g, s, w, h, scale) {
-  const p = s.pts, base = BRUSH[s.brush] * w * scale;
-  if (p.length === 1) { g.beginPath(); g.arc(p[0][0] * w, p[0][1] * h, base * p[0][2] / 2, 0, Math.PI * 2); g.fillStyle = g.strokeStyle; g.fill(); return; }
+function rand(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+function paintDesign(g, w, h) {
+  const d = DESIGNS.find(x => x.id === bg);
+  if (!d || d.id === "none") return;
+  if (d.solid) { g.fillStyle = d.solid; g.fillRect(0, 0, w, h); }
+  else { const gr = g.createLinearGradient(0, 0, w * .35, h); d.stops.forEach(([c, o]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h); }
+  const R = rand(7);
+  if (d.lines) { g.strokeStyle = d.lines; g.lineWidth = Math.max(1, w * .002); for (let y = h * .12; y < h; y += h * .07) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); } }
+  if (d.noise) { for (let i = 0; i < 900; i++) { g.fillStyle = "rgba(255,255,255," + (R() * .06) + ")"; g.fillRect(R() * w, R() * h, w * .004, w * .004); } }
+  if (d.stars) { for (let i = 0; i < 140; i++) { const r = w * (.001 + R() * .004); g.fillStyle = "rgba(255,255,255," + (.3 + R() * .7) + ")"; g.beginPath(); g.arc(R() * w, R() * h, r, 0, 7); g.fill(); } }
+  if (d.pattern) { g.fillStyle = "rgba(255,255,255,.18)"; g.font = (w * .06) + "px sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+    for (let y = 0; y < 9; y++) for (let x = 0; x < 6; x++) g.fillText(d.pattern, (x + (y % 2) * .5 + .25) * w / 6, (y + .5) * h / 9); }
+  if (d.confetti) { const cs = ["#ffd60a", "#ff6ad5", "#64d2ff", "#34d399", "#ff8a65"];
+    for (let i = 0; i < 90; i++) { g.save(); g.translate(R() * w, R() * h); g.rotate(R() * 6.3); g.fillStyle = cs[i % 5]; g.globalAlpha = .75; g.fillRect(0, 0, w * .02, w * .008); g.restore(); } }
+}
+
+// strokes: points are [x, y, widthFactor]
+function strokeSegs(g, s, w, h, scale, colorAt) {
+  const p = s.pts, base = WIDTH[s.brush] * (s.size || 1) * w * scale;
+  if (p.length === 1) { g.beginPath(); g.arc(p[0][0] * w, p[0][1] * h, base / 2, 0, 7); g.fillStyle = colorAt ? colorAt(0) : g.strokeStyle; g.fill(); return; }
   for (let i = 1; i < p.length; i++) {
     const a = p[i - 1], b = p[i];
     const ax = i === 1 ? a[0] : (p[i - 2][0] + a[0]) / 2, ay = i === 1 ? a[1] : (p[i - 2][1] + a[1]) / 2;
-    const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+    const ex = i === p.length - 1 ? b[0] : (a[0] + b[0]) / 2, ey = i === p.length - 1 ? b[1] : (a[1] + b[1]) / 2;
     g.lineWidth = base * (s.brush === "pen" ? (a[2] + b[2]) / 2 : 1);
-    g.beginPath(); g.moveTo(ax * w, ay * h); g.quadraticCurveTo(a[0] * w, a[1] * h, (i === p.length - 1 ? b[0] : mx) * w, (i === p.length - 1 ? b[1] : my) * h); g.stroke();
+    if (colorAt) g.strokeStyle = colorAt(i);
+    g.beginPath(); g.moveTo(ax * w, ay * h); g.quadraticCurveTo(a[0] * w, a[1] * h, ex * w, ey * h); g.stroke();
   }
 }
-function draw(g, w, h) {
+function paintStroke(g, s, w, h) {
+  g.save(); g.lineCap = "round"; g.lineJoin = "round";
+  if (s.brush === "marker") { g.globalAlpha = .82; g.strokeStyle = s.color; strokeSegs(g, s, w, h, 1); }
+  else if (s.brush === "glow") {
+    g.shadowColor = s.color; g.shadowBlur = w * .045; g.strokeStyle = s.color; strokeSegs(g, s, w, h, 1.6);
+    g.shadowBlur = w * .015; strokeSegs(g, s, w, h, 1.6);
+    g.shadowBlur = 0; g.strokeStyle = "rgba(255,255,255,.9)"; strokeSegs(g, s, w, h, .55);
+  } else if (s.brush === "rainbow") { strokeSegs(g, s, w, h, 1, i => "hsl(" + ((s.hue + i * 5) % 360) + ",95%,62%)"); }
+  else if (s.brush === "spray") {
+    const R = rand(s.seed), rad = WIDTH.spray * (s.size || 1) * w / 2;
+    g.fillStyle = s.color;
+    for (const q of s.pts) for (let k = 0; k < 14; k++) { const a = R() * 6.283, d = Math.sqrt(R()) * rad; g.globalAlpha = .5 + R() * .5; g.fillRect(q[0] * w + Math.cos(a) * d, q[1] * h + Math.sin(a) * d, w * .003, w * .003); }
+  } else { g.strokeStyle = s.color; strokeSegs(g, s, w, h, 1); }
+  g.restore();
+}
+function paintThing(g, o, w, h) {
+  g.save(); g.translate(o.x * w, o.y * h); g.rotate(o.r); g.textAlign = "center"; g.textBaseline = "middle";
+  const px = o.s * w;
+  if (o.t === "k") { g.fillStyle = "#000"; /* opaque, or the emoji inherits a see-through fill */ g.font = px + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.shadowColor = "rgba(0,0,0,.35)"; g.shadowBlur = px * .12; g.shadowOffsetY = px * .04; g.fillText(o.emoji, 0, 0); }
+  else {
+    const f = FONTS[o.font] || FONTS.bold;
+    g.font = f.css.replace("1em", px + "px"); g.fillStyle = o.color;
+    if (f.glow) { g.shadowColor = o.color; g.shadowBlur = px * .5; g.fillText(o.text, 0, 0); g.shadowBlur = px * .15; g.fillText(o.text, 0, 0); g.shadowBlur = 0; g.fillStyle = "rgba(255,255,255,.85)"; }
+    else { g.shadowColor = "rgba(0,0,0,.35)"; g.shadowBlur = px * .15; g.shadowOffsetY = px * .04; }
+    g.fillText(o.text, 0, 0);
+  }
+  g.restore();
+}
+function boxOf(o, w) { // half width / half height of a sticker or text, in pad pixels
+  const px = o.s * w;
+  if (o.t === "k") return [px * .6, px * .6];
+  const f = FONTS[o.font] || FONTS.bold; ctx.save(); ctx.font = f.css.replace("1em", px + "px"); const tw = ctx.measureText(o.text).width; ctx.restore();
+  return [tw / 2 + px * .15, px * .65];
+}
+function render(g, w, h, forScreen) {
   g.clearRect(0, 0, w, h);
-  g.lineCap = "round"; g.lineJoin = "round";
-  for (const s of strokes) {
-    g.save();
-    if (s.brush === "marker") { g.globalAlpha = .82; g.strokeStyle = s.color; strokePath(g, s, w, h, 1); }
-    else if (s.brush === "glow") {
-      g.shadowColor = s.color; g.shadowBlur = w * .045; g.strokeStyle = s.color; strokePath(g, s, w, h, 1.6);
-      g.shadowBlur = w * .015; strokePath(g, s, w, h, 1.6);
-      g.shadowBlur = 0; g.strokeStyle = "rgba(255,255,255,.9)"; strokePath(g, s, w, h, .55);
-    } else { g.strokeStyle = s.color; strokePath(g, s, w, h, 1); }
-    g.restore();
+  paintDesign(g, w, h);
+  for (const o of items) o.t === "s" ? paintStroke(g, o, w, h) : paintThing(g, o, w, h);
+  if (forScreen && selected) { // dashed outline around the selected sticker (screen only)
+    const [hw, hh] = boxOf(selected, w);
+    g.save(); g.translate(selected.x * w, selected.y * h); g.rotate(selected.r);
+    g.setLineDash([w * .015, w * .012]); g.lineWidth = Math.max(1.5, w * .004); g.strokeStyle = "rgba(255,255,255,.85)";
+    g.shadowColor = "rgba(0,0,0,.5)"; g.shadowBlur = 4; g.strokeRect(-hw, -hh, hw * 2, hh * 2); g.restore();
   }
-  emptyEl.style.opacity = strokes.length ? 0 : 1;
 }
+function redraw() {
+  render(ctx, cv.width, cv.height, true);
+  emptyEl.style.opacity = items.length || bg !== "none" ? 0 : 1;
+  delBtn.classList.toggle("show", !!selected);
+}
+
+// ---------- touch: draw, drag stickers, pinch to resize/turn ----------
+const pointers = new Map();
+let cur = null, last = null, drag = null, pinch = null;
 function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }
+function hit(x, y) {
+  const w = cv.width, h = cv.height;
+  for (let i = items.length - 1; i >= 0; i--) {
+    const o = items[i]; if (o.t === "s") continue;
+    const [hw, hh] = boxOf(o, w), dx = (x - o.x) * w, dy = (y - o.y) * h, c = Math.cos(-o.r), s = Math.sin(-o.r);
+    const lx = dx * c - dy * s, ly = dx * s + dy * c;
+    if (Math.abs(lx) <= hw * 1.15 && Math.abs(ly) <= hh * 1.15) return o;
+  }
+  return null;
+}
+function pinchInfo() {
+  const [a, b] = [...pointers.values()], r = cv.getBoundingClientRect();
+  return { d: Math.hypot((a[0] - b[0]) * r.width, (a[1] - b[1]) * r.height), ang: Math.atan2((b[1] - a[1]) * r.height, (b[0] - a[0]) * r.width) };
+}
 cv.addEventListener("pointerdown", e => {
   cv.setPointerCapture(e.pointerId);
-  const [x, y] = pt(e);
-  cur = { color, brush, pts: [[x, y, 1]] }; strokes.push(cur);
-  last = { x, y, t: e.timeStamp, w: 1 };
-  clearTimeout(sendTimer); draw(ctx, cv.width, cv.height);
+  const p = pt(e); pointers.set(e.pointerId, p);
+  clearTimeout(sendTimer);
+  if (pointers.size === 2) {
+    if (cur) { items.splice(items.indexOf(cur), 1); undoStack.pop(); cur = null; } // second finger: it's a pinch, not a stroke
+    const target = selected || hit(...p);
+    if (target) { if (!drag) remember(); selected = target; const pi = pinchInfo(); pinch = { o: target, d: pi.d, ang: pi.ang, s: target.s, r: target.r }; drag = null; }
+    redraw(); return;
+  }
+  if (pointers.size > 2) return;
+  const o = hit(...p);
+  if (o) { remember(); selected = o; items.splice(items.indexOf(o), 1); items.push(o); drag = { o, dx: p[0] - o.x, dy: p[1] - o.y, moved: false }; redraw(); return; }
+  selected = null;
+  if (tab !== "draw") { redraw(); return; }
+  remember();
+  cur = { t: "s", color, brush, size: sizeMul, pts: [[p[0], p[1], 1]], hue: Math.floor(Math.random() * 360), seed: Math.floor(Math.random() * 1e9) };
+  items.push(cur); last = { x: p[0], y: p[1], t: e.timeStamp, w: 1 };
+  redraw();
 });
 cv.addEventListener("pointermove", e => {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, pt(e));
+  if (pinch && pointers.size === 2) {
+    const pi = pinchInfo();
+    pinch.o.s = Math.max(.04, Math.min(.9, pinch.s * pi.d / pinch.d));
+    pinch.o.r = pinch.r + (pi.ang - pinch.ang);
+    return redraw();
+  }
+  if (drag) { const [x, y] = pt(e); drag.o.x = Math.max(0, Math.min(1, x - drag.dx)); drag.o.y = Math.max(0, Math.min(1, y - drag.dy)); drag.moved = true; return redraw(); }
   if (!cur) return;
   for (const ev of (e.getCoalescedEvents ? e.getCoalescedEvents() : [e])) {
     const [x, y] = pt(ev), dt = Math.max(1, ev.timeStamp - last.t), d = Math.hypot(x - last.x, y - last.y);
     if (d < 0.002) continue;
-    const speed = d / dt * 1000;                                  // pad-widths per second
-    const target = Math.max(.45, Math.min(1.35, 1.45 - speed * .35)); // faster = thinner, like ink
-    const w = last.w * .75 + target * .25;
+    const speed = d / dt * 1000, target = Math.max(.45, Math.min(1.35, 1.45 - speed * .35)), w = last.w * .75 + target * .25;
     cur.pts.push([x, y, w]); last = { x, y, t: ev.timeStamp, w };
   }
-  draw(ctx, cv.width, cv.height);
+  redraw();
 });
-function end() { if (!cur) return; cur = null; queueSend(); }
-cv.addEventListener("pointerup", end);
-cv.addEventListener("pointercancel", end);
+function up(e) {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.delete(e.pointerId);
+  if (pinch) { if (pointers.size < 2) { pinch = null; queueSend(); } return; }
+  if (drag) { if (!drag.moved) undoStack.pop(); else queueSend(); drag = null; return; }
+  if (cur) { cur = null; queueSend(); }
+}
+cv.addEventListener("pointerup", up);
+cv.addEventListener("pointercancel", up);
 
-document.getElementById("undo").onclick = () => { if (!strokes.length) return; strokes.pop(); draw(ctx, cv.width, cv.height); strokes.length ? queueSend() : sendClear(); };
-const clearBtn = document.getElementById("clear");
+delBtn.onclick = () => { if (!selected) return; remember(); items.splice(items.indexOf(selected), 1); selected = null; redraw(); queueSend(); };
+$("undo").onclick = () => { if (!undoStack.length) return; restore(undoStack.pop()); redraw(); queueSend(); };
+const clearBtn = $("clear");
 let clearArmed = 0;
 clearBtn.onclick = () => {   // tap twice to clear, so a stray tap doesn't wipe the TV
-  if (!strokes.length) return;
+  if (!items.length && bg === "none") return;
   if (!clearArmed) { clearBtn.classList.add("warn"); clearArmed = setTimeout(() => { clearBtn.classList.remove("warn"); clearArmed = 0; }, 1800); return; }
   clearTimeout(clearArmed); clearArmed = 0; clearBtn.classList.remove("warn");
-  strokes = []; draw(ctx, cv.width, cv.height); sendClear();
+  remember(); items = []; selected = null; bg = "none"; choose($("designs"), $("designs").firstChild); redraw(); queueSend();
 };
 
-// ---------- sending: 1 second after you lift your finger ----------
-const statusEl = document.getElementById("status"), statusText = statusEl.querySelector("span"), flash = document.getElementById("flash");
+// ---------- sending: 1 second after you finish ----------
+const statusEl = $("status"), statusText = statusEl.querySelector("span"), flash = $("flash");
 let sendTimer = 0;
 function setStatus(t, cls) { statusText.textContent = t; statusEl.className = cls || ""; }
-function sent() {
-  flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go");
-  if (navigator.vibrate) navigator.vibrate(8);
-}
+function sent() { flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go"); if (navigator.vibrate) navigator.vibrate(8); }
 function queueSend() { clearTimeout(sendTimer); setStatus("Sending", "busy"); sendTimer = setTimeout(send, 1000); }
 async function send() {
   if (!okCode(code)) return pairEl.classList.add("show");
+  if (!items.length && bg === "none") return sendClear();
   const out = document.createElement("canvas"); out.width = OUT_W; out.height = OUT_H;
-  draw(out.getContext("2d"), OUT_W, OUT_H);
-  draw(ctx, cv.width, cv.height); // draw() toggles the hint; redraw the screen copy
+  render(out.getContext("2d"), OUT_W, OUT_H, false);
   const blob = await new Promise(ok => out.toBlob(ok, "image/png"));
   try {
     const r = await fetch(RELAY + encodeURIComponent(code) + "?filename=note.png", { method: "PUT", body: blob });
