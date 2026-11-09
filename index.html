@@ -138,59 +138,98 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
 #mode { flex: none; }
 #mode button { padding: 0 14px; font-size: 15px; }
 body.remote #wrap, body.remote .dock, body.remote #send, body.remote #status { display: none; }
-#remote { display: none; width: 100%; max-width: 440px; flex: 1; min-height: 0; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+
+/* ===== Remote ===== */
+@property --spin { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+body.remote { --tint: 124, 92, 255; }
+body.remote .aura { background:
+    radial-gradient(45% 35% at 50% 18%, rgba(var(--tint), .55), transparent 70%),
+    radial-gradient(35% 30% at 15% 85%, rgba(var(--tint), .28), transparent 70%),
+    radial-gradient(35% 30% at 90% 70%, rgba(255, 90, 160, .22), transparent 70%);
+  transition: background 900ms var(--ease); }
+#remote { display: none; width: 100%; max-width: 430px; flex: 1; min-height: 0; flex-direction: column; align-items: stretch; gap: clamp(10px, 1.8vh, 16px); }
 body.remote #remote { display: flex; }
 
-/* touchpad: swipe to move, tap the middle for OK, tap an edge to step */
-#touch { position: relative; width: min(100%, 46vh); aspect-ratio: 1; border-radius: 40px; touch-action: none;
-  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.10), rgba(255,255,255,.03) 70%);
-  box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi), 0 30px 80px -30px rgba(0,0,0,.9);
-  -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); overflow: hidden; }
-#touch .chev { position: absolute; color: rgba(255,255,255,.35); width: 26px; height: 26px; pointer-events: none; transition: color 150ms, transform 150ms; }
-#touch .chev.lit { color: #fff; }
-#touch .c-up { top: 16px; left: calc(50% - 13px); } #touch .c-down { bottom: 16px; left: calc(50% - 13px); }
-#touch .c-left { left: 16px; top: calc(50% - 13px); } #touch .c-right { right: 16px; top: calc(50% - 13px); }
-#touch .okdot { position: absolute; left: 50%; top: 50%; width: 34%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); display: grid; place-items: center; font-size: 15px; font-weight: 700; color: rgba(255,255,255,.55);
-  transition: background 150ms, transform 150ms; pointer-events: none; }
-#touch .okdot.lit { background: rgba(255,255,255,.16); transform: translate(-50%, -50%) scale(.94); color: #fff; }
-#touch .ripple { position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgba(255,255,255,.35), transparent 70%); animation: ripple 500ms var(--ease) forwards; }
-@keyframes ripple { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+/* touch surface */
+#touch { position: relative; flex: 1; min-height: 190px; border-radius: 38px; touch-action: none; overflow: hidden; isolation: isolate;
+  --x: 50%; --y: 50%; --glow: 0;
+  background:
+    radial-gradient(220px circle at var(--x) var(--y), rgba(var(--tint), calc(.45 * var(--glow))), transparent 70%),
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,.07) 1px, transparent 1.5px) 0 0 / 18px 18px,
+    linear-gradient(165deg, rgba(255,255,255,.09), rgba(255,255,255,.025) 60%);
+  box-shadow: inset 0 1px 0 var(--hi), 0 30px 80px -30px rgba(0,0,0,.95);
+  -webkit-backdrop-filter: blur(30px) saturate(1.4); backdrop-filter: blur(30px) saturate(1.4); }
+#touch::before { /* slowly turning light around the edge */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.2px; pointer-events: none; z-index: -1;
+  background: conic-gradient(from var(--spin), rgba(255,255,255,.08), rgba(var(--tint), .9), rgba(255,255,255,.08) 30%, rgba(255,255,255,.08) 60%, rgba(255,140,200,.7), rgba(255,255,255,.08));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: spin 7s linear infinite; }
+@keyframes spin { to { --spin: 360deg; } }
+#touch .chev { position: absolute; color: rgba(255,255,255,.28); width: 30px; height: 30px; pointer-events: none;
+  transition: color 160ms, transform 260ms var(--spring), filter 160ms; }
+#touch .chev.lit { color: #fff; filter: drop-shadow(0 0 10px rgba(var(--tint), 1)); }
+#touch .c-up { top: 18px; left: calc(50% - 15px); }    #touch .c-up.lit { transform: translateY(-6px); }
+#touch .c-down { bottom: 18px; left: calc(50% - 15px); } #touch .c-down.lit { transform: translateY(6px); }
+#touch .c-left { left: 18px; top: calc(50% - 15px); }  #touch .c-left.lit { transform: translateX(-6px); }
+#touch .c-right { right: 18px; top: calc(50% - 15px); } #touch .c-right.lit { transform: translateX(6px); }
+#touch .okdot { position: absolute; left: 50%; top: 50%; height: min(38%, 120px); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  display: grid; place-items: center; font-size: 15px; font-weight: 800; letter-spacing: .08em; color: rgba(255,255,255,.5);
+  background: radial-gradient(circle at 50% 35%, rgba(255,255,255,.10), rgba(255,255,255,.02));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.2);
+  transition: transform 220ms var(--spring), background 160ms, color 160ms, box-shadow 160ms; pointer-events: none; }
+#touch .okdot.lit { transform: translate(-50%, -50%) scale(.9); color: #fff;
+  background: radial-gradient(circle at 50% 35%, rgba(var(--tint), .7), rgba(var(--tint), .2)); box-shadow: 0 0 40px rgba(var(--tint), .7), inset 0 0 0 1px rgba(255,255,255,.4); }
+#touch .hint { position: absolute; left: 0; right: 0; bottom: 54px; text-align: center; font-size: 12.5px; font-weight: 600; letter-spacing: .04em;
+  color: rgba(255,255,255,.28); pointer-events: none; transition: opacity 600ms; }
+#touch.used .hint { opacity: 0; }
+#touch .ripple { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,.45), rgba(var(--tint), .25) 40%, transparent 70%); animation: ripple 520ms var(--ease) forwards; }
+@keyframes ripple { from { transform: scale(.25); opacity: 1; } to { transform: scale(1.7); opacity: 0; } }
+#touch .streak { position: absolute; height: 4px; width: 90px; margin: -2px 0 0 -45px; border-radius: 4px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.9), transparent); filter: drop-shadow(0 0 8px rgba(var(--tint), 1));
+  animation: streak 420ms var(--ease) forwards; }
+@keyframes streak { from { opacity: 1; } to { opacity: 0; translate: var(--dx) var(--dy); } }
 
-.keys { width: 100%; display: flex; justify-content: center; gap: 14px; }
-.rk { width: 58px; height: 58px; border: 0; border-radius: 50%; display: grid; place-items: center;
-  background: rgba(255,255,255,.09); box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi);
-  transition: transform 140ms var(--ease), background 140ms; }
+/* buttons */
+.cluster { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }
+.cluster .side { display: flex; gap: 12px; }
+.cluster .side.l { justify-content: flex-end; } .cluster .side.r { justify-content: flex-start; }
+.rk { width: 60px; height: 60px; border: 0; border-radius: 50%; display: grid; place-items: center; color: #fff;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.16), rgba(255,255,255,.05));
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.18), inset 0 1px 0 rgba(255,255,255,.28), 0 12px 26px -12px rgba(0,0,0,.9);
+  transition: transform 180ms var(--spring), box-shadow 180ms; }
 .rk svg { width: 24px; height: 24px; }
-.rk:active { transform: scale(.9); background: rgba(255,255,255,.2); }
-.rk.wide { width: auto; padding: 0 18px; border-radius: 999px; font-size: 15px; font-weight: 600; gap: 6px; display: flex; align-items: center; }
-.apps { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.apps button { height: 46px; border: 0; border-radius: 14px; font-size: 13.5px; font-weight: 700; letter-spacing: -.01em;
-  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.2); transition: transform 140ms var(--ease); }
-.apps button:active { transform: scale(.93); }
-#mic { width: 100%; height: 54px; border: 0; border-radius: 18px; display: flex; align-items: center; justify-content: center; gap: 10px;
-  font-size: 16px; font-weight: 700; color: #fff;
-  background: linear-gradient(135deg, rgba(120,90,255,.55), rgba(255,90,160,.45));
-  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.3), inset 0 1px 0 rgba(255,255,255,.35), 0 14px 34px -14px rgba(160,90,255,.8);
-  transition: transform 140ms var(--ease); }
-#mic svg { width: 22px; height: 22px; }
-#mic:active { transform: scale(.97); }
-#voice .orb { width: 120px; height: 120px; border-radius: 50%; align-self: center; display: grid; place-items: center;
-  background: radial-gradient(circle at 35% 30%, #c4b5ff, #7c5cff 45%, #ff5aa8); box-shadow: 0 0 60px rgba(160,90,255,.6); }
-#voice .orb svg { width: 44px; height: 44px; color: #fff; }
-#voice.listening .orb { animation: breathe 1.2s ease-in-out infinite; }
-@keyframes breathe { 50% { transform: scale(1.1); box-shadow: 0 0 90px rgba(255,90,168,.75); } }
-#voice .heard { font-size: 26px; font-weight: 700; letter-spacing: -.02em; text-align: center; min-height: 1.3em; }
-#voice .will { font-size: 15px; color: var(--muted); text-align: center; min-height: 1.4em; }
-#voice .tips { font-size: 13px; color: var(--muted); line-height: 1.6; text-align: center; }
-.micin { position: relative; }
-.micin input { width: 100%; padding-right: 54px; }
-.micin button { position: absolute; right: 6px; top: 6px; width: 40px; height: 40px; border: 0; border-radius: 12px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
-.micin button svg { width: 20px; height: 20px; }
-.micin button.on { background: #ff375f; }
-#rstatus { font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.4; min-height: 2.8em; }
+.rk:active, .rk.hit { transform: scale(.88); box-shadow: inset 0 0 0 1px rgba(255,255,255,.4), 0 0 26px rgba(var(--tint), .7); }
+.rk.small { width: 52px; height: 52px; }
+.rk.small svg { width: 21px; height: 21px; }
+#mic { width: 78px; height: 78px; border: 0; border-radius: 50%; display: grid; place-items: center; color: #fff; position: relative;
+  background: radial-gradient(circle at 35% 28%, #d6ccff, #7c5cff 45%, #ff4fa3 100%);
+  box-shadow: 0 0 0 5px rgba(255,255,255,.06), 0 16px 40px -12px rgba(160,90,255,.95), inset 0 1px 0 rgba(255,255,255,.5);
+  transition: transform 200ms var(--spring); }
+#mic svg { width: 30px; height: 30px; }
+#mic:active { transform: scale(.9); }
+#mic::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 1.5px solid rgba(200,170,255,.45); animation: halo 2.6s ease-out infinite; }
+@keyframes halo { from { transform: scale(.9); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
+
+/* volume rocker */
+.rocker { display: grid; grid-template-columns: 1fr 1fr 1fr; height: 54px; border-radius: 999px; overflow: hidden;
+  background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.22); }
+.rocker button { border: 0; background: transparent; color: #fff; display: grid; place-items: center; transition: background 160ms; }
+.rocker button + button { box-shadow: inset 1px 0 0 rgba(255,255,255,.1); }
+.rocker button svg { width: 24px; height: 24px; }
+.rocker button:active, .rocker button.hit { background: rgba(var(--tint), .35); }
+
+/* app shelf */
+.shelf { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 4px; margin: 0 -2px; scroll-snap-type: x proximity; }
+.shelf::-webkit-scrollbar { display: none; }
+.app { flex: none; width: 64px; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 0; background: none; color: var(--muted);
+  font-size: 11px; font-weight: 600; scroll-snap-align: start; }
+.app i { width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center; font-style: normal; font-weight: 800; letter-spacing: -.03em;
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.22), 0 10px 22px -10px rgba(0,0,0,.9); transition: transform 200ms var(--spring); }
+.app:active i, .app.hit i { transform: scale(.88); }
+#rstatus { font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.4; min-height: 1.4em; transition: color 200ms; }
 #rstatus.err { color: #ff6961; }
+@media (max-height: 700px) { #touch .hint { display: none; } .rk { width: 52px; height: 52px; } #mic { width: 66px; height: 66px; } .rocker { height: 46px; } .app i { width: 50px; height: 50px; border-radius: 15px; } }
 
 /* sheets */
 .sheet { position: fixed; inset: 0; display: none; flex-direction: column; justify-content: center; gap: 14px; padding: 28px;
@@ -284,36 +323,36 @@ body.remote #remote { display: flex; }
 
 <div id="remote">
   <div id="touch">
-    <svg class="chev c-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>
-    <svg class="chev c-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-    <svg class="chev c-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
-    <svg class="chev c-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    <svg class="chev c-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg><svg class="chev c-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><svg class="chev c-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg><svg class="chev c-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
     <div class="okdot">OK</div>
+    <div class="hint">SWIPE TO MOVE · TAP TO SELECT</div>
   </div>
-  <div class="keys">
-    <button class="rk wide" data-c="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Back</button>
-    <button class="rk wide" data-c="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg>Home</button>
-    <button class="rk" data-c="playpause" aria-label="Play or pause"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5v14l9-7z"/><rect x="15" y="5" width="2.6" height="14" rx="1"/><rect x="19.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+  <div class="cluster">
+    <div class="side l"><button class="rk" data-c="back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button></div>
+    <button id="mic" aria-label="Speak to your TV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <div class="side r"><button class="rk" data-c="home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg></button></div>
   </div>
-  <div class="keys">
-    <button class="rk" data-c="rewind" aria-label="Rewind"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 6v12L2.5 12zM21 6v12l-8.5-6z"/></svg></button>
-    <button class="rk" data-c="forward" aria-label="Fast forward"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8.5-6zM3 6v12l8.5-6z"/></svg></button>
-    <button class="rk" data-c="voldown" aria-label="Volume down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4"/></svg></button>
-    <button class="rk" data-c="mute" aria-label="Mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="m17 9 5 6M22 9l-5 6"/></svg></button>
-    <button class="rk" data-c="volup" aria-label="Volume up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4M19 10v4"/></svg></button>
+  <div class="cluster">
+    <div class="side l"><button class="rk small" data-c="rewind" aria-label="Rewind"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 6v12L2.5 12zM21 6v12l-8.5-6z"/></svg></button></div>
+    <button class="rk" data-c="playpause" aria-label="Play or pause" style="width:68px;height:68px"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5v14l9-7z"/><rect x="15" y="5" width="2.6" height="14" rx="1"/><rect x="19.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+    <div class="side r"><button class="rk small" data-c="forward" aria-label="Fast forward"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8.5-6zM3 6v12l8.5-6z"/></svg></button></div>
   </div>
-  <button id="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Speak to your TV</button>
-  <div class="apps">
-    <button data-c="open:netflix" style="background:#000;color:#e50914">NETFLIX</button>
-    <button data-c="open:prime" style="background:#0f171e;color:#1a98ff">prime</button>
-    <button data-c="open:crave" style="background:#19123f;color:#fff">crave</button>
-    <button data-c="open:youtube" style="background:#fff;color:#ff0033">YouTube</button>
-    <button data-c="open:disney" style="background:#0e2366;color:#fff">Disney+</button>
-    <button data-c="open:hulu" style="background:#1ce783;color:#0b0c0f">hulu</button>
-    <button data-c="settings" style="background:rgba(255,255,255,.1)">Settings</button>
-    <button data-c="open:firetv" style="background:rgba(255,255,255,.1)">Fire TV</button>
+  <div class="rocker">
+    <button data-c="voldown" aria-label="Volume down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4"/></svg></button>
+    <button data-c="mute" aria-label="Mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="m17 9 5 6M22 9l-5 6"/></svg></button>
+    <button data-c="volup" aria-label="Volume up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4M19 10v4"/></svg></button>
   </div>
-  <div id="rstatus">Swipe or tap the pad to move, tap the middle for OK.<br>Arrows work on your home screen, YouTube and Prime Video.</div>
+  <div class="shelf">
+    <button class="app" data-c="open:netflix"><i style="background:#000;color:#e50914;font-size:26px">N</i>Netflix</button>
+    <button class="app" data-c="open:prime"><i style="background:#0f171e;color:#1a98ff;font-size:13px">prime</i>Prime</button>
+    <button class="app" data-c="open:crave"><i style="background:linear-gradient(140deg,#2a1c66,#07061a);color:#fff;font-size:14px">crave</i>Crave</button>
+    <button class="app" data-c="open:youtube"><i style="background:#fff;color:#ff0033;font-size:22px">▶</i>YouTube</button>
+    <button class="app" data-c="open:disney"><i style="background:radial-gradient(120% 140% at 50% 115%,#1d4fb8,#040b26 75%);color:#fff;font-size:14px">D+</i>Disney+</button>
+    <button class="app" data-c="open:hulu"><i style="background:#1ce783;color:#0b0c0f;font-size:15px">hulu</i>Hulu</button>
+    <button class="app" data-c="settings"><i style="background:rgba(255,255,255,.12);color:#fff;font-size:22px">⚙︎</i>Settings</button>
+    <button class="app" data-c="open:firetv"><i style="background:rgba(255,255,255,.12);color:#ff9900;font-size:13px">fire</i>Fire TV</button>
+  </div>
+  <div id="rstatus">Arrows work on your home screen, YouTube and Prime Video.</div>
 </div>
 
 <div class="sheet" id="pair">
@@ -756,8 +795,14 @@ sendBtn.onclick = async () => {
 // Each press is one short message on "<code>-ctl". The home screen app on the TV carries it out.
 const rstatus = $("rstatus"), touch = $("touch");
 let lastErr = 0;
+// the whole remote takes on the colour of the app you opened
+const TINT = { netflix: "229,9,20", prime: "26,152,255", crave: "140,90,255", youtube: "255,0,51", disney: "40,100,235", hulu: "28,231,131", firetv: "255,153,0" };
+function setTint(id) { const t = TINT[id] || "124,92,255"; document.body.style.setProperty("--tint", t); save("tint", id); }
+setTint(load("tint") || "");
 async function command(c) {
   if (!okCode(code)) return pairEl.classList.add("show");
+  if (c.startsWith("open:")) setTint(c.slice(5));
+  else if (c === "home") setTint("");
   if (navigator.vibrate) navigator.vibrate(6);
   try {
     const r = await fetch(RELAY + encodeURIComponent(code) + "-ctl", { method: "POST", body: c, keepalive: true });
@@ -811,6 +856,31 @@ function touchEnd(e) {
 }
 touch.addEventListener("pointerup", touchEnd);
 touch.addEventListener("pointercancel", () => { tStart = null; });
+
+// light that follows your finger, and a streak for each step
+function glowAt(e, on) {
+  const r = touch.getBoundingClientRect();
+  touch.style.setProperty("--x", (e.clientX - r.left) + "px"); touch.style.setProperty("--y", (e.clientY - r.top) + "px");
+  touch.style.setProperty("--glow", on ? 1 : 0);
+}
+touch.addEventListener("pointerdown", e => { glowAt(e, true); touch.classList.add("used"); });
+touch.addEventListener("pointermove", e => { if (tStart) glowAt(e, true); });
+["pointerup", "pointercancel", "pointerleave"].forEach(t => touch.addEventListener(t, e => glowAt(e, false)));
+const _lightUp = lightUp;
+lightUp = el => {
+  _lightUp(el);
+  const d = ["up", "down", "left", "right"].find(k => el.classList.contains("c-" + k));
+  if (!d) return;
+  const r = touch.getBoundingClientRect(), s = document.createElement("i"), v = { up: [0, -60], down: [0, 60], left: [-60, 0], right: [60, 0] }[d];
+  s.className = "streak"; s.style.left = r.width / 2 + "px"; s.style.top = r.height / 2 + "px";
+  if (d === "up" || d === "down") s.style.transform = "rotate(90deg)";
+  s.style.setProperty("--dx", v[0] + "px"); s.style.setProperty("--dy", v[1] + "px");
+  touch.appendChild(s); setTimeout(() => s.remove(), 450);
+};
+// buttons: a little press pulse even on phones that don't vibrate
+document.querySelectorAll("#remote [data-c]").forEach(b => b.addEventListener("click", () => {
+  b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit"); setTimeout(() => b.classList.remove("hit"), 200);
+}));
 
 // ---------- Dictation ----------
 // Uses the phone's own speech recognition (Safari / Chrome). If it isn't available,
