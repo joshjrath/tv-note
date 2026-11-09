@@ -31,18 +31,22 @@ button { font: inherit; color: inherit; }
 body { display: flex; flex-direction: column; align-items: center; gap: 12px;
   padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom)); }
 
-header { width: 100%; max-width: 520px; display: flex; align-items: center; justify-content: space-between; padding: 2px 4px; }
-h1 { font-size: 26px; font-weight: 700; letter-spacing: -.025em; }
-h1 span { font-weight: 400; color: var(--muted); }
-#status { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 999px;
-  font-size: 13px; font-weight: 600; color: var(--muted);
-  background: var(--glass); box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi);
-  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); transition: color 300ms; }
-#status i { width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; transition: background 300ms; }
+header { width: 100%; max-width: 520px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 2px 2px 4px; }
+h1 { font-size: 26px; font-weight: 700; letter-spacing: -.025em; white-space: nowrap; }
+.hright { display: flex; align-items: center; gap: 10px; min-width: 0; }
+#status { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; overflow: hidden; }
+#status i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; transition: background 300ms; }
 #status.live { color: var(--text); } #status.live i { background: #30d158; box-shadow: 0 0 10px #30d158; }
+#status.dirty i { background: #ffd60a; }
 #status.busy i { background: #ffd60a; animation: pulse 900ms ease-in-out infinite; }
 #status.err { color: #ff6961; } #status.err i { background: #ff453a; }
 @keyframes pulse { 50% { opacity: .3; } }
+#send { flex: none; height: 40px; padding: 0 18px 0 14px; border: 0; border-radius: 999px; background: var(--text); color: #000;
+  font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 7px; box-shadow: 0 10px 30px -10px rgba(255,255,255,.35);
+  transition: transform 160ms var(--ease), opacity 200ms; }
+#send svg { width: 17px; height: 17px; }
+#send:active { transform: scale(.94); }
+#send:disabled { opacity: .4; }
 
 /* pad: same 4:5 shape as the card on the TV */
 #wrap { flex: 1; width: 100%; display: grid; place-items: center; min-height: 0; }
@@ -68,47 +72,55 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
 #del svg { width: 15px; height: 15px; }
 
 /* dock */
-.dock { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 10px; padding: 10px;
+.dock { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 9px; padding: 10px;
   border-radius: 26px; background: var(--glass);
   box-shadow: inset 0 0 0 .5px var(--edge), inset 0 1px 0 var(--hi), 0 20px 50px -20px rgba(0,0,0,.8);
   -webkit-backdrop-filter: blur(30px) saturate(1.6); backdrop-filter: blur(30px) saturate(1.6); }
 .line { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .seg { display: flex; padding: 3px; border-radius: 999px; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 .5px var(--edge);
-  overflow-x: auto; scrollbar-width: none; }
+  overflow-x: auto; scrollbar-width: none; min-width: 0; }
 .seg::-webkit-scrollbar { display: none; }
-.seg button { flex: none; height: 32px; padding: 0 13px; border: 0; border-radius: 999px; background: transparent; color: var(--muted);
-  font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: background 200ms, color 200ms; }
-.seg button svg { width: 16px; height: 16px; }
+.seg button { flex: none; height: 32px; padding: 0 11px; border: 0; border-radius: 999px; background: transparent; color: var(--muted);
+  font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: background 200ms, color 200ms; }
 .seg button.on { background: rgba(255,255,255,.16); color: var(--text); box-shadow: inset 0 1px 0 var(--hi); }
 .icons { display: flex; gap: 6px; flex: none; }
-.ib { width: 38px; height: 38px; border: 0; border-radius: 50%; display: grid; place-items: center;
+.ib { width: 36px; height: 36px; border: 0; border-radius: 50%; display: grid; place-items: center;
   background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 .5px var(--edge); transition: transform 160ms var(--ease), background 200ms; }
 .ib svg { width: 18px; height: 18px; }
 .ib:active { transform: scale(.9); }
 .ib.warn { background: rgba(255,69,58,.85); }
 
-.panel { display: none; flex-direction: column; gap: 10px; }
+.panel { display: none; flex-direction: column; gap: 9px; }
 .panel.on { display: flex; }
-.scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px 6px; scroll-snap-type: x proximity; }
+.scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px 6px; scroll-snap-type: x proximity; min-width: 0; }
 .scroll::-webkit-scrollbar { display: none; }
 
-/* colours */
+/* shared colour + size row */
+#paint { display: flex; align-items: center; gap: 8px; }
+#paint.hide { display: none; }
+#sizes { flex: none; display: flex; gap: 2px; align-items: center; padding-right: 4px; border-right: .5px solid var(--edge); }
+#sizes button { width: 28px; height: 30px; border: 0; background: transparent; display: grid; place-items: center; }
+#sizes button i { display: block; border-radius: 50%; background: var(--muted); }
+#sizes button.on i { background: var(--text); box-shadow: 0 0 0 3px rgba(255,255,255,.18); }
 .dot { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 0; position: relative; scroll-snap-align: start;
-  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.25); transition: transform 260ms var(--spring); }
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.25); }
 .dot::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; box-shadow: 0 0 0 2px var(--text); opacity: 0; transform: scale(.8);
   transition: opacity 200ms, transform 260ms var(--spring); }
 .dot.on::after { opacity: 1; transform: none; }
-.dot.custom { background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); overflow: visible; }
+.dot.custom { background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); }
 .dot.custom input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; }
-#sizes { display: flex; gap: 6px; align-items: center; }
-#sizes button { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; }
-#sizes button i { display: block; border-radius: 50%; background: var(--muted); }
-#sizes button.on i { background: var(--text); }
+
+/* shapes */
+.shapes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.shapes button { height: 44px; border: 0; border-radius: 12px; background: rgba(255,255,255,.06); display: grid; place-items: center;
+  box-shadow: inset 0 0 0 .5px var(--edge); color: var(--muted); transition: background 160ms, color 160ms; }
+.shapes button svg { width: 22px; height: 22px; }
+.shapes button.on { background: rgba(255,255,255,.18); color: var(--text); box-shadow: inset 0 0 0 1.5px var(--text); }
 
 /* stickers */
-.stk { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-height: 128px; overflow-y: auto; scrollbar-width: none; }
+.stk { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-height: 120px; overflow-y: auto; scrollbar-width: none; }
 .stk::-webkit-scrollbar { display: none; }
-.stk button { aspect-ratio: 1; border: 0; border-radius: 12px; background: transparent; font-size: 26px; line-height: 1;
+.stk button { aspect-ratio: 1; border: 0; border-radius: 12px; background: transparent; font-size: 25px; line-height: 1;
   transition: transform 160ms var(--ease), background 160ms; }
 .stk button:active { transform: scale(.85); background: rgba(255,255,255,.1); }
 .textbtn { height: 38px; border: 0; border-radius: 12px; background: rgba(255,255,255,.1); font-size: 15px; font-weight: 600;
@@ -141,10 +153,16 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
 </head>
 <body>
 <div class="aura"></div>
-<header><h1>TV Note <span>✎</span></h1><div id="status"><i></i><span>Ready</span></div></header>
+<header>
+  <h1>TV Note</h1>
+  <div class="hright">
+    <div id="status"><i></i><span>Draw, then send</span></div>
+    <button id="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Send</button>
+  </div>
+</header>
 
 <div id="wrap"><div id="pad"><canvas id="c"></canvas>
-  <div id="empty"><div><b>Draw something</b>Add stickers and designs below.<br>It shows up on your TV a second later.</div></div>
+  <div id="empty"><div><b>Draw something</b>Add shapes, stickers and designs below.<br>Tap Send to put it on your TV.</div></div>
   <div id="flash"></div>
   <button id="del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button>
 </div></div>
@@ -153,6 +171,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
   <div class="line">
     <div class="seg" id="tabs">
       <button data-t="draw" class="on">Draw</button>
+      <button data-t="shapes">Shapes</button>
       <button data-t="stickers">Stickers</button>
       <button data-t="designs">Designs</button>
     </div>
@@ -163,17 +182,33 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
   </div>
 
   <div class="panel on" id="p-draw">
-    <div class="line">
-      <div class="seg" id="brushes">
-        <button data-b="pen" class="on">Pen</button>
-        <button data-b="marker">Marker</button>
-        <button data-b="glow">Glow</button>
-        <button data-b="rainbow">Rainbow</button>
-        <button data-b="spray">Spray</button>
-      </div>
-      <div id="sizes"></div>
+    <div class="seg" id="brushes">
+      <button data-b="pen" class="on">Pen</button>
+      <button data-b="marker">Marker</button>
+      <button data-b="highlighter">Highlighter</button>
+      <button data-b="glow">Glow</button>
+      <button data-b="rainbow">Rainbow</button>
+      <button data-b="calligraphy">Calligraphy</button>
+      <button data-b="chalk">Chalk</button>
+      <button data-b="dotted">Dotted</button>
+      <button data-b="spray">Spray</button>
+      <button data-b="eraser">Eraser</button>
     </div>
-    <div class="scroll" id="colors"></div>
+  </div>
+
+  <div class="panel" id="p-shapes">
+    <div class="shapes" id="shapes">
+      <button data-s="line" class="on" aria-label="Line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 19 19 5"/></svg></button>
+      <button data-s="arrow" aria-label="Arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5M10 5h9v9"/></svg></button>
+      <button data-s="rect" aria-label="Square"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="5" width="16" height="14" rx="3"/></svg></button>
+      <button data-s="circle" aria-label="Circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/></svg></button>
+      <button data-s="heart" aria-label="Heart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+      <button data-s="star" aria-label="Star"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg></button>
+    </div>
+    <div class="seg" id="fill" style="align-self:flex-start">
+      <button data-f="outline" class="on">Outline</button>
+      <button data-f="filled">Filled</button>
+    </div>
   </div>
 
   <div class="panel" id="p-stickers">
@@ -185,6 +220,8 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: 
   <div class="panel" id="p-designs">
     <div class="scroll" id="designs"></div>
   </div>
+
+  <div id="paint"><div id="sizes"></div><div class="scroll" id="colors"></div></div>
 </div>
 
 <div class="sheet" id="pair">
@@ -229,8 +266,8 @@ const DESIGNS = [
   { id: "stars",    name: "Stars",    css: "linear-gradient(180deg,#141a3a,#05060f)", stops: [["#141a3a", 0], ["#05060f", 1]], stars: true },
   { id: "confetti", name: "Party",    css: "linear-gradient(160deg,#2b1055,#7597de)", stops: [["#2b1055", 0], ["#7597de", 1]], confetti: true }
 ];
-const WIDTH = { pen: .011, marker: .03, glow: .009, rainbow: .016, spray: .05 };
-const SIZES = [.6, 1, 1.7];
+const WIDTH = { pen: .011, marker: .03, highlighter: .06, glow: .009, rainbow: .016, calligraphy: .028, chalk: .022, dotted: .014, spray: .05, eraser: .06, shape: .012 };
+const SIZES = [.55, 1, 1.8];
 const FONTS = {
   bold:   { css: '800 1em -apple-system, "SF Pro Display", Inter, sans-serif' },
   script: { css: '400 1em "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive' },
@@ -244,33 +281,39 @@ function save(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 let code = decodeURIComponent(location.hash.slice(1)) || load("code") || "";
 if (location.hash) { if (okCode(code)) save("code", code); history.replaceState(null, "", location.pathname); }
-const pairEl = document.getElementById("pair");
+const $ = id => document.getElementById(id);
+const pairEl = $("pair");
 if (!okCode(code)) pairEl.classList.add("show");
-document.getElementById("save").onclick = () => {
-  const v = document.getElementById("code").value.trim();
+$("save").onclick = () => {
+  const v = $("code").value.trim();
   if (!okCode(v)) return;
   code = v; save("code", v); pairEl.classList.remove("show");
 };
 
 // ---------- state ----------
-// items, drawn in order: strokes {t:"s"}, stickers {t:"k"} and text {t:"x"}. Positions are 0..1 of the pad.
+// Layers, bottom to top: design, ink (strokes + shapes; the eraser only removes ink), stickers + text.
+// Positions are 0..1 of the pad, so the TV copy is drawn sharp at its own size.
 let items = [], bg = "none", selected = null;
-let color = COLORS[0], brush = "pen", sizeMul = 1, tab = "draw", font = "bold";
+let color = COLORS[0], brush = "pen", sizeMul = 1, tab = "draw", font = "bold", shape = "line", fillMode = "outline";
 const undoStack = [];
 const snap = () => JSON.stringify({ items, bg });
 function remember() { undoStack.push(snap()); if (undoStack.length > 60) undoStack.shift(); }
 function restore(s) { const o = JSON.parse(s); items = o.items; bg = o.bg; selected = null; }
+const isInk = o => o.t === "s" || o.t === "h";
 
-// ---------- UI: tabs, brushes, sizes, colours, stickers, designs ----------
-const $ = id => document.getElementById(id);
+// ---------- UI ----------
 function choose(group, el) { group.querySelectorAll("button").forEach(b => b.classList.toggle("on", b === el)); }
 $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => {
   tab = b.dataset.t; choose($("tabs"), b);
   document.querySelectorAll(".panel").forEach(p => p.classList.toggle("on", p.id === "p-" + tab));
+  $("paint").classList.toggle("hide", tab === "designs");
+  if (tab !== "stickers") { selected = null; redraw(); }
 });
 $("brushes").querySelectorAll("button").forEach(b => b.onclick = () => { brush = b.dataset.b; choose($("brushes"), b); });
+$("shapes").querySelectorAll("button").forEach(b => b.onclick = () => { shape = b.dataset.s; choose($("shapes"), b); });
+$("fill").querySelectorAll("button").forEach(b => b.onclick = () => { fillMode = b.dataset.f; choose($("fill"), b); });
 SIZES.forEach((m, i) => {
-  const b = document.createElement("button"), d = 6 + i * 6;
+  const b = document.createElement("button"), d = 5 + i * 6;
   b.innerHTML = '<i style="width:' + d + 'px;height:' + d + 'px"></i>'; b.className = i === 1 ? "on" : "";
   b.setAttribute("aria-label", ["Thin", "Medium", "Thick"][i]);
   b.onclick = () => { sizeMul = m; choose($("sizes"), b); };
@@ -296,13 +339,13 @@ STICKERS.forEach(s => {
   $("stickers").appendChild(b);
 });
 DESIGNS.forEach((d, i) => {
-  const b = document.createElement("button"); b.className = "des" + (i === 0 ? " on" : "");
+  const b = document.createElement("button"); b.className = "des" + (i === 0 ? " on" : ""); b.dataset.id = d.id;
   b.innerHTML = '<i style="background:' + d.css + '"></i><span>' + d.name + "</span>";
-  b.onclick = () => { if (bg === d.id) return; remember(); bg = d.id; choose($("designs"), b); redraw(); queueSend(); };
+  b.onclick = () => { if (bg === d.id) return; remember(); bg = d.id; choose($("designs"), b); designDirty = true; changed(); };
   $("designs").appendChild(b);
 });
+function syncDesignButtons() { $("designs").querySelectorAll(".des").forEach(b => b.classList.toggle("on", b.dataset.id === bg)); }
 
-// text
 const textSheet = $("textSheet"), textIn = $("textIn");
 $("addText").onclick = () => { textIn.value = ""; textSheet.classList.add("show"); setTimeout(() => textIn.focus(), 50); };
 $("fonts").querySelectorAll("button").forEach(b => b.onclick = () => { font = b.dataset.f; choose($("fonts"), b); });
@@ -311,17 +354,9 @@ $("textAdd").onclick = () => {
   const t = textIn.value.trim(); textSheet.classList.remove("show"); textIn.blur();
   if (t) addThing({ t: "x", text: t, x: .5, y: .5, s: .11, r: 0, color, font });
 };
-function addThing(o) { remember(); items.push(o); selected = o; redraw(); queueSend(); }
+function addThing(o) { remember(); items.push(o); selected = o; changed(); }
 
-// ---------- drawing ----------
-const pad = $("pad"), cv = $("c"), ctx = cv.getContext("2d"), emptyEl = $("empty"), delBtn = $("del");
-function size() {
-  const r = pad.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 3);
-  cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
-  redraw();
-}
-addEventListener("resize", size);
-
+// ---------- painting ----------
 function rand(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 function paintDesign(g, w, h) {
   const d = DESIGNS.find(x => x.id === bg);
@@ -338,38 +373,109 @@ function paintDesign(g, w, h) {
     for (let i = 0; i < 90; i++) { g.save(); g.translate(R() * w, R() * h); g.rotate(R() * 6.3); g.fillStyle = cs[i % 5]; g.globalAlpha = .75; g.fillRect(0, 0, w * .02, w * .008); g.restore(); } }
 }
 
-// strokes: points are [x, y, widthFactor]
-function strokeSegs(g, s, w, h, scale, colorAt) {
-  const p = s.pts, base = WIDTH[s.brush] * (s.size || 1) * w * scale;
-  if (p.length === 1) { g.beginPath(); g.arc(p[0][0] * w, p[0][1] * h, base / 2, 0, 7); g.fillStyle = colorAt ? colorAt(0) : g.strokeStyle; g.fill(); return; }
+// one smooth path through all points (fast: a single stroke() call)
+function pathOf(p, w, h, jx = 0, jy = 0) {
+  const P = new Path2D();
+  P.moveTo(p[0][0] * w + jx, p[0][1] * h + jy);
+  if (p.length === 1) { P.lineTo(p[0][0] * w + jx + .01, p[0][1] * h + jy); return P; }
+  for (let i = 1; i < p.length - 1; i++) {
+    P.quadraticCurveTo(p[i][0] * w + jx, p[i][1] * h + jy, (p[i][0] + p[i + 1][0]) / 2 * w + jx, (p[i][1] + p[i + 1][1]) / 2 * h + jy);
+  }
+  P.lineTo(p[p.length - 1][0] * w + jx, p[p.length - 1][1] * h + jy);
+  return P;
+}
+// per-segment drawing, for brushes whose width or colour changes along the line
+function eachSeg(g, p, w, h, fn) {
+  if (p.length === 1) { fn(0, p[0], p[0]); g.beginPath(); g.arc(p[0][0] * w, p[0][1] * h, g.lineWidth / 2, 0, 7); g.fillStyle = g.strokeStyle; g.fill(); return; }
   for (let i = 1; i < p.length; i++) {
     const a = p[i - 1], b = p[i];
     const ax = i === 1 ? a[0] : (p[i - 2][0] + a[0]) / 2, ay = i === 1 ? a[1] : (p[i - 2][1] + a[1]) / 2;
     const ex = i === p.length - 1 ? b[0] : (a[0] + b[0]) / 2, ey = i === p.length - 1 ? b[1] : (a[1] + b[1]) / 2;
-    g.lineWidth = base * (s.brush === "pen" ? (a[2] + b[2]) / 2 : 1);
-    if (colorAt) g.strokeStyle = colorAt(i);
+    fn(i, a, b);
     g.beginPath(); g.moveTo(ax * w, ay * h); g.quadraticCurveTo(a[0] * w, a[1] * h, ex * w, ey * h); g.stroke();
   }
 }
 function paintStroke(g, s, w, h) {
+  const base = WIDTH[s.brush] * (s.size || 1) * w;
   g.save(); g.lineCap = "round"; g.lineJoin = "round";
-  if (s.brush === "marker") { g.globalAlpha = .82; g.strokeStyle = s.color; strokeSegs(g, s, w, h, 1); }
-  else if (s.brush === "glow") {
-    g.shadowColor = s.color; g.shadowBlur = w * .045; g.strokeStyle = s.color; strokeSegs(g, s, w, h, 1.6);
-    g.shadowBlur = w * .015; strokeSegs(g, s, w, h, 1.6);
-    g.shadowBlur = 0; g.strokeStyle = "rgba(255,255,255,.9)"; strokeSegs(g, s, w, h, .55);
-  } else if (s.brush === "rainbow") { strokeSegs(g, s, w, h, 1, i => "hsl(" + ((s.hue + i * 5) % 360) + ",95%,62%)"); }
-  else if (s.brush === "spray") {
-    const R = rand(s.seed), rad = WIDTH.spray * (s.size || 1) * w / 2;
-    g.fillStyle = s.color;
-    for (const q of s.pts) for (let k = 0; k < 14; k++) { const a = R() * 6.283, d = Math.sqrt(R()) * rad; g.globalAlpha = .5 + R() * .5; g.fillRect(q[0] * w + Math.cos(a) * d, q[1] * h + Math.sin(a) * d, w * .003, w * .003); }
-  } else { g.strokeStyle = s.color; strokeSegs(g, s, w, h, 1); }
+  switch (s.brush) {
+    case "pen": g.strokeStyle = s.color; eachSeg(g, s.pts, w, h, (i, a, b) => { g.lineWidth = base * (a[2] + b[2]) / 2; }); break;
+    case "marker": g.globalAlpha = .85; g.strokeStyle = s.color; g.lineWidth = base; g.stroke(pathOf(s.pts, w, h)); break;
+    case "highlighter": g.globalAlpha = .38; g.lineCap = "butt"; g.strokeStyle = s.color; g.lineWidth = base; g.stroke(pathOf(s.pts, w, h)); break;
+    case "glow": {
+      const P = pathOf(s.pts, w, h);
+      g.strokeStyle = s.color; g.shadowColor = s.color;
+      g.lineWidth = base * 1.6; g.shadowBlur = w * .04; g.stroke(P);
+      g.shadowBlur = w * .012; g.stroke(P);
+      g.shadowBlur = 0; g.strokeStyle = "rgba(255,255,255,.9)"; g.lineWidth = base * .55; g.stroke(P);
+      break;
+    }
+    case "rainbow": g.lineWidth = base; eachSeg(g, s.pts, w, h, i => { g.strokeStyle = "hsl(" + ((s.hue + i * 5) % 360) + ",95%,62%)"; }); break;
+    case "calligraphy": { // a flat nib held at 45°: sweep it along the line as filled quads
+      const nx = Math.cos(-Math.PI / 4) * base / 2, ny = Math.sin(-Math.PI / 4) * base / 2, p = s.pts;
+      g.fillStyle = s.color; g.strokeStyle = s.color; g.lineWidth = Math.max(1, w * .0015);
+      const P = new Path2D();
+      for (let i = 1; i < p.length; i++) {
+        const ax = p[i - 1][0] * w, ay = p[i - 1][1] * h, bx = p[i][0] * w, by = p[i][1] * h;
+        P.moveTo(ax + nx, ay + ny); P.lineTo(bx + nx, by + ny); P.lineTo(bx - nx, by - ny); P.lineTo(ax - nx, ay - ny); P.closePath();
+      }
+      if (p.length === 1) { P.moveTo(p[0][0] * w + nx, p[0][1] * h + ny); P.lineTo(p[0][0] * w - nx, p[0][1] * h - ny); g.stroke(P); }
+      g.fill(P, "nonzero"); g.stroke(P); // thin outline closes hairline gaps between quads
+      break;
+    }
+    case "chalk": {
+      const R = rand(s.seed); g.strokeStyle = s.color; g.lineWidth = base * .28;
+      for (let k = 0; k < 5; k++) { g.globalAlpha = .35 + R() * .3; g.stroke(pathOf(s.pts, w, h, (R() - .5) * base * .9, (R() - .5) * base * .9)); }
+      break;
+    }
+    case "dotted": g.strokeStyle = s.color; g.lineWidth = base; g.setLineDash([.01, base * 2]); g.stroke(pathOf(s.pts, w, h)); break;
+    case "spray": {
+      const R = rand(s.seed), rad = base / 2; g.fillStyle = s.color;
+      for (const q of s.pts) for (let k = 0; k < 12; k++) { const a = R() * 6.283, d = Math.sqrt(R()) * rad; g.globalAlpha = .5 + R() * .5; g.fillRect(q[0] * w + Math.cos(a) * d, q[1] * h + Math.sin(a) * d, w * .003, w * .003); }
+      break;
+    }
+    case "eraser": g.globalCompositeOperation = "destination-out"; g.strokeStyle = "#000"; g.lineWidth = base; g.stroke(pathOf(s.pts, w, h)); break;
+  }
   g.restore();
 }
+function shapePath(o, w, h) {
+  const x1 = o.x1 * w, y1 = o.y1 * h, x2 = o.x2 * w, y2 = o.y2 * h, P = new Path2D();
+  const l = Math.min(x1, x2), t = Math.min(y1, y2), W = Math.abs(x2 - x1), H = Math.abs(y2 - y1), cx = l + W / 2, cy = t + H / 2;
+  switch (o.shape) {
+    case "line": P.moveTo(x1, y1); P.lineTo(x2, y2); break;
+    case "arrow": {
+      P.moveTo(x1, y1); P.lineTo(x2, y2);
+      const a = Math.atan2(y2 - y1, x2 - x1), L = Math.max(w * .035, Math.hypot(x2 - x1, y2 - y1) * .22);
+      P.moveTo(x2 - L * Math.cos(a - .5), y2 - L * Math.sin(a - .5)); P.lineTo(x2, y2); P.lineTo(x2 - L * Math.cos(a + .5), y2 - L * Math.sin(a + .5));
+      break;
+    }
+    case "rect": { const r = Math.min(W, H) * .12; P.roundRect ? P.roundRect(l, t, W, H, r) : P.rect(l, t, W, H); break; }
+    case "circle": P.ellipse(cx, cy, W / 2, H / 2, 0, 0, Math.PI * 2); break;
+    case "heart":
+      P.moveTo(cx, t + H * .95);
+      P.bezierCurveTo(l - W * .05, t + H * .6, l, t + H * .05, cx - W * .25, t + H * .05);
+      P.bezierCurveTo(cx - W * .1, t + H * .05, cx, t + H * .18, cx, t + H * .28);
+      P.bezierCurveTo(cx, t + H * .18, cx + W * .1, t + H * .05, cx + W * .25, t + H * .05);
+      P.bezierCurveTo(l + W, t + H * .05, l + W * 1.05, t + H * .6, cx, t + H * .95); P.closePath(); break;
+    case "star":
+      for (let i = 0; i < 10; i++) { const r = i % 2 ? .4 : 1, a = -Math.PI / 2 + i * Math.PI / 5; const px = cx + Math.cos(a) * W / 2 * r, py = cy + Math.sin(a) * H / 2 * r; i ? P.lineTo(px, py) : P.moveTo(px, py); }
+      P.closePath(); break;
+  }
+  return P;
+}
+function paintShape(g, o, w, h) {
+  const P = shapePath(o, w, h);
+  g.save(); g.lineCap = "round"; g.lineJoin = "round";
+  if (o.fill === "filled" && o.shape !== "line" && o.shape !== "arrow") { g.fillStyle = o.color; g.fill(P); }
+  else { g.strokeStyle = o.color; g.lineWidth = WIDTH.shape * (o.size || 1) * w; g.stroke(P); }
+  g.restore();
+}
+function paintInk(g, o, w, h) { o.t === "s" ? paintStroke(g, o, w, h) : paintShape(g, o, w, h); }
 function paintThing(g, o, w, h) {
   g.save(); g.translate(o.x * w, o.y * h); g.rotate(o.r); g.textAlign = "center"; g.textBaseline = "middle";
   const px = o.s * w;
-  if (o.t === "k") { g.fillStyle = "#000"; /* opaque, or the emoji inherits a see-through fill */ g.font = px + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.shadowColor = "rgba(0,0,0,.35)"; g.shadowBlur = px * .12; g.shadowOffsetY = px * .04; g.fillText(o.emoji, 0, 0); }
+  if (o.t === "k") { g.fillStyle = "#000"; /* opaque, or the emoji inherits a see-through fill */
+    g.font = px + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.shadowColor = "rgba(0,0,0,.35)"; g.shadowBlur = px * .12; g.shadowOffsetY = px * .04; g.fillText(o.emoji, 0, 0); }
   else {
     const f = FONTS[o.font] || FONTS.bold;
     g.font = f.css.replace("1em", px + "px"); g.fillStyle = o.color;
@@ -379,37 +485,64 @@ function paintThing(g, o, w, h) {
   }
   g.restore();
 }
-function boxOf(o, w) { // half width / half height of a sticker or text, in pad pixels
+function boxOf(o, w) {
   const px = o.s * w;
   if (o.t === "k") return [px * .6, px * .6];
   const f = FONTS[o.font] || FONTS.bold; ctx.save(); ctx.font = f.css.replace("1em", px + "px"); const tw = ctx.measureText(o.text).width; ctx.restore();
   return [tw / 2 + px * .15, px * .65];
 }
-function render(g, w, h, forScreen) {
-  g.clearRect(0, 0, w, h);
+function canvasOf(w, h) { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+
+// full render (used for the image sent to the TV)
+function renderAll(g, w, h) {
   paintDesign(g, w, h);
-  for (const o of items) o.t === "s" ? paintStroke(g, o, w, h) : paintThing(g, o, w, h);
-  if (forScreen && selected) { // dashed outline around the selected sticker (screen only)
-    const [hw, hh] = boxOf(selected, w);
-    g.save(); g.translate(selected.x * w, selected.y * h); g.rotate(selected.r);
-    g.setLineDash([w * .015, w * .012]); g.lineWidth = Math.max(1.5, w * .004); g.strokeStyle = "rgba(255,255,255,.85)";
-    g.shadowColor = "rgba(0,0,0,.5)"; g.shadowBlur = 4; g.strokeRect(-hw, -hh, hw * 2, hh * 2); g.restore();
-  }
+  const ink = canvasOf(w, h), ig = ink.getContext("2d");
+  for (const o of items) if (isInk(o)) paintInk(ig, o, w, h);
+  g.drawImage(ink, 0, 0);
+  for (const o of items) if (!isInk(o)) paintThing(g, o, w, h);
 }
-function redraw() {
-  render(ctx, cv.width, cv.height, true);
+
+// ---------- screen: cached layers, so long drawings and glow stay smooth ----------
+const pad = $("pad"), cv = $("c"), ctx = cv.getContext("2d"), emptyEl = $("empty"), delBtn = $("del");
+let designC, inkC, liveC, designDirty = true, inkDirty = true, active = null, frame = 0;
+function size() {
+  const r = pad.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
+  designC = canvasOf(cv.width, cv.height); inkC = canvasOf(cv.width, cv.height); liveC = canvasOf(cv.width, cv.height);
+  designDirty = inkDirty = true; draw();
+}
+addEventListener("resize", size);
+function draw() {
+  frame = 0;
+  const w = cv.width, h = cv.height;
+  if (designDirty) { const g = designC.getContext("2d"); g.clearRect(0, 0, w, h); paintDesign(g, w, h); designDirty = false; }
+  if (inkDirty) { const g = inkC.getContext("2d"); g.clearRect(0, 0, w, h); for (const o of items) if (isInk(o) && o !== active) paintInk(g, o, w, h); inkDirty = false; }
+  ctx.clearRect(0, 0, w, h);
+  ctx.drawImage(designC, 0, 0);
+  if (active && isInk(active)) {                 // committed ink + the line being drawn right now
+    const g = liveC.getContext("2d"); g.clearRect(0, 0, w, h); g.drawImage(inkC, 0, 0); paintInk(g, active, w, h); ctx.drawImage(liveC, 0, 0);
+  } else ctx.drawImage(inkC, 0, 0);
+  for (const o of items) if (!isInk(o)) paintThing(ctx, o, w, h);
+  if (selected) {
+    const [hw, hh] = boxOf(selected, w);
+    ctx.save(); ctx.translate(selected.x * w, selected.y * h); ctx.rotate(selected.r);
+    ctx.setLineDash([w * .015, w * .012]); ctx.lineWidth = Math.max(1.5, w * .004); ctx.strokeStyle = "rgba(255,255,255,.85)";
+    ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 4; ctx.strokeRect(-hw, -hh, hw * 2, hh * 2); ctx.restore();
+  }
   emptyEl.style.opacity = items.length || bg !== "none" ? 0 : 1;
   delBtn.classList.toggle("show", !!selected);
 }
+function redraw() { if (!frame) frame = requestAnimationFrame(draw); }
+function changed() { inkDirty = true; redraw(); markDirty(); }
 
-// ---------- touch: draw, drag stickers, pinch to resize/turn ----------
+// ---------- touch ----------
 const pointers = new Map();
-let cur = null, last = null, drag = null, pinch = null;
+let last = null, drag = null, pinch = null;
 function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }
 function hit(x, y) {
   const w = cv.width, h = cv.height;
   for (let i = items.length - 1; i >= 0; i--) {
-    const o = items[i]; if (o.t === "s") continue;
+    const o = items[i]; if (isInk(o)) continue;
     const [hw, hh] = boxOf(o, w), dx = (x - o.x) * w, dy = (y - o.y) * h, c = Math.cos(-o.r), s = Math.sin(-o.r);
     const lx = dx * c - dy * s, ly = dx * s + dy * c;
     if (Math.abs(lx) <= hw * 1.15 && Math.abs(ly) <= hh * 1.15) return o;
@@ -423,21 +556,25 @@ function pinchInfo() {
 cv.addEventListener("pointerdown", e => {
   cv.setPointerCapture(e.pointerId);
   const p = pt(e); pointers.set(e.pointerId, p);
-  clearTimeout(sendTimer);
   if (pointers.size === 2) {
-    if (cur) { items.splice(items.indexOf(cur), 1); undoStack.pop(); cur = null; } // second finger: it's a pinch, not a stroke
+    if (active && isInk(active)) { items.splice(items.indexOf(active), 1); undoStack.pop(); active = null; inkDirty = true; } // 2 fingers = pinch, not a line
     const target = selected || hit(...p);
     if (target) { if (!drag) remember(); selected = target; const pi = pinchInfo(); pinch = { o: target, d: pi.d, ang: pi.ang, s: target.s, r: target.r }; drag = null; }
-    redraw(); return;
+    return redraw();
   }
   if (pointers.size > 2) return;
   const o = hit(...p);
-  if (o) { remember(); selected = o; items.splice(items.indexOf(o), 1); items.push(o); drag = { o, dx: p[0] - o.x, dy: p[1] - o.y, moved: false }; redraw(); return; }
-  selected = null;
-  if (tab !== "draw") { redraw(); return; }
-  remember();
-  cur = { t: "s", color, brush, size: sizeMul, pts: [[p[0], p[1], 1]], hue: Math.floor(Math.random() * 360), seed: Math.floor(Math.random() * 1e9) };
-  items.push(cur); last = { x: p[0], y: p[1], t: e.timeStamp, w: 1 };
+  if (o) { remember(); selected = o; items.splice(items.indexOf(o), 1); items.push(o); drag = { o, dx: p[0] - o.x, dy: p[1] - o.y, moved: false }; return redraw(); }
+  if (selected) { selected = null; redraw(); }
+  if (tab === "draw") {
+    remember();
+    active = { t: "s", color, brush, size: sizeMul, pts: [[p[0], p[1], 1]], hue: Math.floor(Math.random() * 360), seed: Math.floor(Math.random() * 1e9) };
+    items.push(active); inkDirty = true; last = { x: p[0], y: p[1], t: e.timeStamp, w: 1 };
+  } else if (tab === "shapes") {
+    remember();
+    active = { t: "h", shape, color, size: sizeMul, fill: fillMode, x1: p[0], y1: p[1], x2: p[0], y2: p[1] };
+    items.push(active); inkDirty = true;
+  }
   redraw();
 });
 cv.addEventListener("pointermove", e => {
@@ -445,69 +582,77 @@ cv.addEventListener("pointermove", e => {
   pointers.set(e.pointerId, pt(e));
   if (pinch && pointers.size === 2) {
     const pi = pinchInfo();
-    pinch.o.s = Math.max(.04, Math.min(.9, pinch.s * pi.d / pinch.d));
-    pinch.o.r = pinch.r + (pi.ang - pinch.ang);
+    pinch.o.s = Math.max(.04, Math.min(.9, pinch.s * pi.d / pinch.d)); pinch.o.r = pinch.r + (pi.ang - pinch.ang);
     return redraw();
   }
   if (drag) { const [x, y] = pt(e); drag.o.x = Math.max(0, Math.min(1, x - drag.dx)); drag.o.y = Math.max(0, Math.min(1, y - drag.dy)); drag.moved = true; return redraw(); }
-  if (!cur) return;
+  if (!active) return;
+  if (active.t === "h") { const [x, y] = pt(e); active.x2 = x; active.y2 = y; return redraw(); }
   for (const ev of (e.getCoalescedEvents ? e.getCoalescedEvents() : [e])) {
     const [x, y] = pt(ev), dt = Math.max(1, ev.timeStamp - last.t), d = Math.hypot(x - last.x, y - last.y);
-    if (d < 0.002) continue;
+    if (d < 0.003) continue;
     const speed = d / dt * 1000, target = Math.max(.45, Math.min(1.35, 1.45 - speed * .35)), w = last.w * .75 + target * .25;
-    cur.pts.push([x, y, w]); last = { x, y, t: ev.timeStamp, w };
+    active.pts.push([x, y, w]); last = { x, y, t: ev.timeStamp, w };
   }
   redraw();
 });
 function up(e) {
   if (!pointers.has(e.pointerId)) return;
   pointers.delete(e.pointerId);
-  if (pinch) { if (pointers.size < 2) { pinch = null; queueSend(); } return; }
-  if (drag) { if (!drag.moved) undoStack.pop(); else queueSend(); drag = null; return; }
-  if (cur) { cur = null; queueSend(); }
+  if (pinch) { if (pointers.size < 2) { pinch = null; markDirty(); } return; }
+  if (drag) { if (!drag.moved) undoStack.pop(); else markDirty(); drag = null; return; }
+  if (active) {
+    if (active.t === "h" && Math.hypot(active.x2 - active.x1, active.y2 - active.y1) < .02) { // a tap: drop a default-size shape
+      const s = .14; active.x1 -= s; active.y1 -= s * .8; active.x2 = active.x1 + 2 * s; active.y2 = active.y1 + 1.6 * s;
+    }
+    active = null; changed();
+  }
 }
 cv.addEventListener("pointerup", up);
 cv.addEventListener("pointercancel", up);
 
-delBtn.onclick = () => { if (!selected) return; remember(); items.splice(items.indexOf(selected), 1); selected = null; redraw(); queueSend(); };
-$("undo").onclick = () => { if (!undoStack.length) return; restore(undoStack.pop()); redraw(); queueSend(); };
+delBtn.onclick = () => { if (!selected) return; remember(); items.splice(items.indexOf(selected), 1); selected = null; changed(); };
+$("undo").onclick = () => { if (!undoStack.length) return; restore(undoStack.pop()); syncDesignButtons(); designDirty = true; changed(); };
 const clearBtn = $("clear");
 let clearArmed = 0;
-clearBtn.onclick = () => {   // tap twice to clear, so a stray tap doesn't wipe the TV
+clearBtn.onclick = () => {   // tap twice to clear the pad (the TV only changes when you tap Send)
   if (!items.length && bg === "none") return;
   if (!clearArmed) { clearBtn.classList.add("warn"); clearArmed = setTimeout(() => { clearBtn.classList.remove("warn"); clearArmed = 0; }, 1800); return; }
   clearTimeout(clearArmed); clearArmed = 0; clearBtn.classList.remove("warn");
-  remember(); items = []; selected = null; bg = "none"; choose($("designs"), $("designs").firstChild); redraw(); queueSend();
+  remember(); items = []; selected = null; bg = "none"; syncDesignButtons(); designDirty = true; changed();
 };
 
-// ---------- sending: 1 second after you finish ----------
-const statusEl = $("status"), statusText = statusEl.querySelector("span"), flash = $("flash");
-let sendTimer = 0;
+// ---------- draft: kept on this phone so nothing is lost before you send ----------
+let draftTimer = 0;
+function markDirty() {
+  setStatus(items.length || bg !== "none" ? "Not sent yet" : "Empty", "dirty");
+  clearTimeout(draftTimer); draftTimer = setTimeout(() => save("draft", snap()), 400);
+}
+try { const d = load("draft"); if (d) { restore(d); syncDesignButtons(); } } catch (e) {}
+
+// ---------- Send: only when you tap it ----------
+const statusEl = $("status"), statusText = statusEl.querySelector("span"), flash = $("flash"), sendBtn = $("send");
 function setStatus(t, cls) { statusText.textContent = t; statusEl.className = cls || ""; }
-function sent() { flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go"); if (navigator.vibrate) navigator.vibrate(8); }
-function queueSend() { clearTimeout(sendTimer); setStatus("Sending", "busy"); sendTimer = setTimeout(send, 1000); }
-async function send() {
+function sent() { flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go"); if (navigator.vibrate) navigator.vibrate(10); }
+sendBtn.onclick = async () => {
   if (!okCode(code)) return pairEl.classList.add("show");
-  if (!items.length && bg === "none") return sendClear();
-  const out = document.createElement("canvas"); out.width = OUT_W; out.height = OUT_H;
-  render(out.getContext("2d"), OUT_W, OUT_H, false);
-  const blob = await new Promise(ok => out.toBlob(ok, "image/png"));
+  sendBtn.disabled = true; setStatus("Sending", "busy");
   try {
-    const r = await fetch(RELAY + encodeURIComponent(code) + "?filename=note.png", { method: "PUT", body: blob });
+    let r;
+    if (!items.length && bg === "none") r = await fetch(RELAY + encodeURIComponent(code), { method: "POST", body: "clear" });
+    else {
+      const out = canvasOf(OUT_W, OUT_H); renderAll(out.getContext("2d"), OUT_W, OUT_H);
+      const blob = await new Promise(ok => out.toBlob(ok, "image/png"));
+      r = await fetch(RELAY + encodeURIComponent(code) + "?filename=note.png", { method: "PUT", body: blob });
+    }
     if (!r.ok) throw new Error(r.status);
-    setStatus("On your TV", "live"); sent();
-  } catch (e) { setStatus("Not sent", "err"); }
-}
-async function sendClear() {
-  clearTimeout(sendTimer);
-  if (!okCode(code)) return;
-  try {
-    const r = await fetch(RELAY + encodeURIComponent(code), { method: "POST", body: "clear" });
-    setStatus(r.ok ? "Cleared" : "Not cleared", r.ok ? "live" : "err");
-  } catch (e) { setStatus("Not cleared", "err"); }
-}
+    setStatus(items.length || bg !== "none" ? "On your TV" : "Removed from TV", "live"); sent();
+  } catch (e) { setStatus("Not sent. Try again.", "err"); }
+  sendBtn.disabled = false;
+};
 
 size();
+if (items.length || bg !== "none") setStatus("Draft not sent yet", "dirty");
 </script>
 </body>
 </html>
