@@ -169,6 +169,26 @@ body.remote #remote { display: flex; }
 .apps button { height: 46px; border: 0; border-radius: 14px; font-size: 13.5px; font-weight: 700; letter-spacing: -.01em;
   box-shadow: inset 0 0 0 .5px rgba(255,255,255,.2); transition: transform 140ms var(--ease); }
 .apps button:active { transform: scale(.93); }
+#mic { width: 100%; height: 54px; border: 0; border-radius: 18px; display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: 16px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, rgba(120,90,255,.55), rgba(255,90,160,.45));
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.3), inset 0 1px 0 rgba(255,255,255,.35), 0 14px 34px -14px rgba(160,90,255,.8);
+  transition: transform 140ms var(--ease); }
+#mic svg { width: 22px; height: 22px; }
+#mic:active { transform: scale(.97); }
+#voice .orb { width: 120px; height: 120px; border-radius: 50%; align-self: center; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, #c4b5ff, #7c5cff 45%, #ff5aa8); box-shadow: 0 0 60px rgba(160,90,255,.6); }
+#voice .orb svg { width: 44px; height: 44px; color: #fff; }
+#voice.listening .orb { animation: breathe 1.2s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.1); box-shadow: 0 0 90px rgba(255,90,168,.75); } }
+#voice .heard { font-size: 26px; font-weight: 700; letter-spacing: -.02em; text-align: center; min-height: 1.3em; }
+#voice .will { font-size: 15px; color: var(--muted); text-align: center; min-height: 1.4em; }
+#voice .tips { font-size: 13px; color: var(--muted); line-height: 1.6; text-align: center; }
+.micin { position: relative; }
+.micin input { width: 100%; padding-right: 54px; }
+.micin button { position: absolute; right: 6px; top: 6px; width: 40px; height: 40px; border: 0; border-radius: 12px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
+.micin button svg { width: 20px; height: 20px; }
+.micin button.on { background: #ff375f; }
 #rstatus { font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.4; min-height: 2.8em; }
 #rstatus.err { color: #ff6961; }
 
@@ -282,6 +302,7 @@ body.remote #remote { display: flex; }
     <button class="rk" data-c="mute" aria-label="Mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="m17 9 5 6M22 9l-5 6"/></svg></button>
     <button class="rk" data-c="volup" aria-label="Volume up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 12h4M19 10v4"/></svg></button>
   </div>
+  <button id="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Speak to your TV</button>
   <div class="apps">
     <button data-c="open:netflix" style="background:#000;color:#e50914">NETFLIX</button>
     <button data-c="open:prime" style="background:#0f171e;color:#1a98ff">prime</button>
@@ -302,9 +323,18 @@ body.remote #remote { display: flex; }
   <div class="row"><button class="primary" id="save">Pair</button></div>
 </div>
 
+<div class="sheet" id="voice">
+  <div class="orb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+  <div class="heard" id="heard">Listening…</div>
+  <div class="will" id="will"></div>
+  <input id="voiceIn" maxlength="120" placeholder="Or type here" autocomplete="off">
+  <div class="tips">Try “open Netflix”, “pause”, “volume up”,<br>“search YouTube for cooking jazz”, or just say words<br>to type them into the search box on the TV.</div>
+  <div class="row"><button class="secondary" id="voiceCancel">Cancel</button><button class="primary" id="voiceGo">Send</button></div>
+</div>
+
 <div class="sheet" id="textSheet">
   <h2>Add text</h2>
-  <input id="textIn" maxlength="40" placeholder="Dinner at 7 ❤️" autocomplete="off">
+  <div class="micin"><input id="textIn" maxlength="40" placeholder="Dinner at 7 ❤️" autocomplete="off"><button id="textMic" aria-label="Dictate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>
   <div class="fonts" id="fonts">
     <button data-f="bold" class="on" style="font-weight:800">Bold</button>
     <button data-f="script" style="font-family:'Snell Roundhand','Segoe Script',cursive">Script</button>
@@ -781,6 +811,91 @@ function touchEnd(e) {
 }
 touch.addEventListener("pointerup", touchEnd);
 touch.addEventListener("pointercancel", () => { tStart = null; });
+
+// ---------- Dictation ----------
+// Uses the phone's own speech recognition (Safari / Chrome). If it isn't available,
+// the text box still works with the keyboard's microphone key.
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+function listen(onText, onDone) {
+  if (!SR) { onDone(false); return null; }
+  const rec = new SR();
+  rec.lang = navigator.language || "en-US"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  let finalText = "";
+  rec.onresult = e => {
+    let t = ""; for (const r of e.results) t += r[0].transcript;
+    onText(t); if (e.results[e.results.length - 1].isFinal) finalText = t;
+  };
+  rec.onerror = () => {};
+  rec.onend = () => onDone(true, finalText);
+  try { rec.start(); } catch (e) { onDone(false); return null; }
+  return rec;
+}
+
+const APP_WORDS = [["netflix", "netflix"], ["prime", "prime"], ["amazon", "prime"], ["crave", "crave"], ["youtube", "youtube"], ["you tube", "youtube"],
+  ["disney", "disney"], ["hulu", "hulu"], ["spotify", "spotify"], ["settings", "settings"], ["fire tv", "firetv"]];
+const APP_NAMES = { netflix: "Netflix", prime: "Prime Video", crave: "Crave", youtube: "YouTube", disney: "Disney+", hulu: "Hulu", spotify: "Spotify", settings: "Settings", firetv: "the Fire TV home" };
+// Turn what was said into one remote command, plus a line saying what will happen.
+function understand(said) {
+  const t = said.trim(), s = t.toLowerCase().replace(/[.!?,]+$/g, "").replace(/^(hey|ok|okay|please)\s+/, "").trim();
+  if (!s) return null;
+  let m;
+  if ((m = s.match(/^(?:search|find|look up|play|watch|put on)\s+(?:youtube|you tube)\s+(?:for\s+)?(.+)$/)) ||
+      (m = s.match(/^(?:search|find|look up|play|watch|put on)\s+(?:for\s+)?(.+?)\s+on\s+(?:youtube|you tube)$/)) ||
+      (m = s.match(/^(?:youtube|you tube)\s+(.+)$/)))
+    return { cmd: "yts:" + m[1].slice(0, 110), label: "Searching YouTube for “" + m[1] + "”" };
+  const appIn = x => { for (const [w, id] of APP_WORDS) if (x.includes(w)) return id; return null; };
+  if ((m = s.match(/^(?:open|launch|start|go to|switch to|show me|put on)\s+(.+)$/)) && appIn(m[1])) {
+    const id = appIn(m[1]); return { cmd: id === "settings" ? "settings" : "open:" + id, label: "Opening " + APP_NAMES[id] };
+  }
+  if (APP_WORDS.some(([w]) => s === w)) { const id = appIn(s); return { cmd: id === "settings" ? "settings" : "open:" + id, label: "Opening " + APP_NAMES[id] }; }
+  const simple = [
+    [/^(pause|play|resume|stop|play pause|unpause)$/, "playpause", "Play / pause"],
+    [/^(volume up|turn (it )?up|louder|turn up the volume|increase (the )?volume)$/, "volup", "Volume up"],
+    [/^(volume down|turn (it )?down|quieter|softer|turn down the volume|lower (the )?volume)$/, "voldown", "Volume down"],
+    [/^(mute|unmute|silence)$/, "mute", "Mute"],
+    [/^(go )?home$|^home screen$/, "home", "Going home"],
+    [/^(go )?back$/, "back", "Back"],
+    [/^(rewind|go back a bit|skip back)$/, "rewind", "Rewind"],
+    [/^(fast forward|skip( ahead)?|skip forward)$/, "forward", "Fast forward"],
+    [/^(select|okay|ok|enter|choose that)$/, "ok", "OK"]
+  ];
+  for (const [re, cmd, label] of simple) if (re.test(s)) return { cmd, label };
+  return { cmd: "type:" + t.slice(0, 118), label: "Typing “" + t + "” into the search box on the TV" };
+}
+
+const voice = $("voice"), heard = $("heard"), will = $("will"), voiceIn = $("voiceIn");
+let rec = null, goTimer = 0;
+function showPlan(text) { const p = understand(text); will.textContent = p ? p.label : ""; return p; }
+function closeVoice() { clearTimeout(goTimer); if (rec) try { rec.abort(); } catch (e) {} rec = null; voice.classList.remove("show", "listening"); voiceIn.blur(); }
+function go() {
+  const p = understand(voiceIn.value || heard.dataset.text || "");
+  if (!p) return;
+  command(p.cmd); rstatus.classList.remove("err"); rstatus.textContent = p.label;
+  closeVoice();
+}
+$("mic").onclick = () => {
+  heard.textContent = SR ? "Listening…" : "Type or use your keyboard's mic"; heard.dataset.text = ""; will.textContent = ""; voiceIn.value = "";
+  voice.classList.add("show");
+  rec = listen(t => { heard.textContent = "“" + t + "”"; heard.dataset.text = t; voiceIn.value = t; showPlan(t); voice.classList.add("listening"); },
+    (ok, finalText) => {
+      voice.classList.remove("listening"); rec = null;
+      if (!ok) { voiceIn.focus(); return; }
+      if (finalText && showPlan(finalText)) goTimer = setTimeout(go, 900); // say it, see what will happen, it goes
+    });
+  if (rec) voice.classList.add("listening");
+};
+voiceIn.oninput = () => { clearTimeout(goTimer); heard.dataset.text = voiceIn.value; showPlan(voiceIn.value); };
+voiceIn.onkeydown = e => { if (e.key === "Enter") go(); };
+$("voiceGo").onclick = go;
+$("voiceCancel").onclick = closeVoice;
+
+// dictation for text stickers in Note mode
+const textMic = $("textMic");
+textMic.onclick = () => {
+  if (!SR) { textIn.focus(); return; }
+  textMic.classList.add("on");
+  listen(t => { textIn.value = t.slice(0, 40); }, () => textMic.classList.remove("on"));
+};
 
 size();
 if (items.length || bg !== "none") setStatus("Draft not sent yet", "dirty");
